@@ -1,0 +1,127 @@
+body {
+    font-family:'Courier New', Courier, monospace;
+}
+
+div.inline { float:left; }
+.clearBoth { clear:both; }
+
+.drawzone {
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+.drawcell {
+    width: 30px;
+    height: 30px;
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+.preview { /* Ration 1.78 */
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+.previewcell {
+    width: 8px;
+    height: 4px;
+}
+
+.palette {
+    width: 100px;
+    height: 400px;
+}
+
+.paletteCell {
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+.paletteCell.selected {
+    border-width:3px; 
+    border-style:solid; 
+    border-color:red;
+}
+
+.title {
+    font-weight: bolder;
+}
+
+.output {
+    font-family:'Courier New', Courier, monospace;
+    width: 500px;
+    height: 350px;
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+    background-color: rgb(230, 230, 230);
+    margin: 5px;
+}
+
+.black {
+    background-color: black;
+}
+
+.white {
+    background-color: white;
+}
+
+.magenta {
+    background-color: #970A74
+}
+
+.brown {
+    background-color: #756B36
+}
+
+.orange {
+    background-color: #F85815
+}
+
+.dark_green {
+    background-color: #007108
+}
+
+.grey1 {
+    background-color: #787A7A
+}
+
+.green {
+    background-color: #44CA00
+}
+
+.yellow {
+    background-color: #DACB1B
+}
+
+.dark_blue {
+    background-color: #2134D1
+}
+
+.violet {
+    background-color: #C735FE
+}
+
+.grey2 {
+    background-color: #797274
+}
+
+.pink {
+    background-color: #FE8DDC
+}
+
+.medium_blue {
+    background-color: #03B6EE
+}
+
+.light_blue {
+    background-color: #ADDEFF
+}
+
+.aqua {
+    background-color: #72E7CB
+}

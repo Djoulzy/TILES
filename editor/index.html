@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr-fr">
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <link rel="stylesheet" href="editor.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+        <script src="editor.js"></script>
+    </head>
+    <body>
+        <div>
+            <div class="inline"><script>displayDrawZone(7, 16)</script></div>
+            <div class="inline">
+                <script>displayPalette()</script>
+                <input name="format" type="radio" value="bin" />Binary
+                <input name="format" type="radio" value="hexa" checked />Hexa
+                <br/>
+                <input id="compute" type="button" value="Compute" />
+            </div>
+            <div class="inline"><script>displayPreview()</script></div>
+        </div>
+        <div class="clearBoth"><br/></div>
+        <div class="clearBoth">
+            <div class="inline">
+                <span class="title">AUX Memory</span>
+                <div id="output_aux" class="output"></div>
+            </div>
+            <div class="inline">
+                <span class="title">MAIN Memory</span>
+                <div id="output_main" class="output"></div>
+            </div>
+        </div>
+    </body>
+</html>
