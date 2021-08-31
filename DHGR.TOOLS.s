@@ -4,7 +4,7 @@ NEW
             .OP	65C02
             .LIST OFF
 *			.OR	$800
-*			.TF /DEV/TILES/OBJ/DHGR.CLR
+*			.TF /DEV/TILES/OBJ/DHGR.TOOLS
 *--------------------------------------
 DHGR_CLR    STA PAGE1       ;Select MAIN memory
             LDY #$02        ;Counter for MAIN/AUX
@@ -136,8 +136,16 @@ DHGR2_CLR   PHA
             BNE .24         ;in AUX memory
             RTS
 *--------------------------------------
+* Y in Y
+			.MA FINDY
+			LDA HTAB_LO,Y		;Find the low byte of the row address
+			STA SCRN_LO 
+			LDA HTAB_HI,Y		;Find the high byte of the row address
+			STA SCRN_HI
+			.EM
+*--------------------------------------
 MAN
-SAVE /DEV/TILES/SRC/DHGR.CLR.S
-TEXT /DEV/TILES/TXT/DHGR.CLR.S
+SAVE /DEV/TILES/SRC/DHGR.TOOLS.S
+TEXT /DEV/TILES/TXT/DHGR.TOOLS.S
 
 ASM

@@ -1,22 +1,22 @@
 var colorValues = {
-    black: {val: 0, bin: "0000"},
-    dark_blue: {val: 1, bin: "0001"},
-    dark_green: {val: 2, bin: "0010"},
-    medium_blue: {val: 3, bin: "0011"},
-    brown: {val: 4, bin: "0100"},
-    grey2: {val: 5, bin: "0101"},
-    green: {val: 6, bin: "0110"},
+    blck: {val: 0, bin: "0000"},
+    dkbl: {val: 1, bin: "0001"},
+    dkgr: {val: 2, bin: "0010"},
+    mdbl: {val: 3, bin: "0011"},
+    brwn: {val: 4, bin: "0100"},
+    gry2: {val: 5, bin: "0101"},
+    gren: {val: 6, bin: "0110"},
     aqua: {val: 7, bin: "0111"},
-    magenta: {val: 8, bin: "1000"},
-    violet: {val: 9, bin: "1001"},
-    grey1: {val: 10, bin: "1010"},
-    light_blue: {val: 11, bin: "1011"},
-    orange: {val: 12, bin: "1100"},
+    mgnt: {val: 8, bin: "1000"},
+    vilt: {val: 9, bin: "1001"},
+    gry1: {val: 10, bin: "1010"},
+    ltbl: {val: 11, bin: "1011"},
+    orge: {val: 12, bin: "1100"},
     pink: {val: 13, bin: "1101"},
-    yellow: {val: 14, bin: "1110"},
-    white: {val: 15, bin: "1111"},
+    ylow: {val: 14, bin: "1110"},
+    whte: {val: 15, bin: "1111"},
 }
-
+var colorSelected = "blck"
 var pictoWidth = 0
 var pictoHeight = 0
 
@@ -36,7 +36,7 @@ function displayDrawZone(width, height) {
     for(let y = 1; y <= height; y++) {
         document.write('    <tr>')
         for(let x = 1; x <= width; x++) {
-            document.write('        <td id="'+cpt+'" class="drawcell black" data-color="0000"></td>')
+            document.write('        <td id="'+cpt+'" class="drawcell blck" data-color="0000" data-name="blck"></td>')
             cpt++
         }
         document.write('    </tr>')
@@ -50,7 +50,7 @@ function displayPreview() {
     for(let y = 1; y <= pictoHeight; y++) {
         document.write('    <tr>')
         for(let x = 1; x <= pictoWidth; x++) {
-            document.write('        <td id="p'+cpt+'" class="previewcell black"></td>')
+            document.write('        <td id="p'+cpt+'" class="previewcell blck"></td>')
             cpt++
         }
         document.write('    </tr>')
@@ -166,11 +166,7 @@ function computeSprite() {
         if (!isset(output[line])) output[line] = new Array
         output[line][cpt] = $(this).data("color")
         cpt++
-        if (cpt > 13) {
-            // console.log(output[line])
-            // output[line] = swapBytes(output[line])
-            // output[line] = invertAndComplete(output[line])
-
+        if (cpt == pictoWidth) {
             output[line] = invertAndComplete(output[line])
             output[line] = addPaletteBit(output[line])
             output[line] = extractBytes(output[line])
@@ -183,10 +179,41 @@ function computeSprite() {
     displayResult(output)
 }
 
+function saveSprite() {
+    var cpt = 0
+    var line = 0
+    var output = new Array
+    $(".drawcell").each(function(index) {
+        if (!isset(output[line])) output[line] = new Array
+        output[line][cpt] = $(this).data("name")
+        cpt++
+        if (cpt == pictoWidth) {    
+            line++
+            cpt = 0
+        }
+    })
+    console.log(output)
+
+    let content = JSON.stringify(output)
+    $("#dialogSave").html(content)
+    $("#dialogSave").dialog("open");
+    navigator.clipboard.writeText(content);
+}
+
+function loadSprite() {
+    let data = JSON.parse($("#importData").val())
+    var cpt = 1
+    data.forEach(function(lines) {
+        lines.forEach(function(cols) {
+            console.log(cols)
+            colorSelected = cols
+            $("#"+cpt).trigger("click")
+            cpt++
+        })
+    })
+}
+
 $(document).ready(function() {
-
-    var colorSelected = "black"
-
     $(".paletteCell").on("click", function() {
         $("#"+colorSelected).removeClass("selected")
         colorSelected = $(this).attr("id")
@@ -200,9 +227,27 @@ $(document).ready(function() {
         $(this).addClass("drawcell "+colorSelected)
         $(previewId).addClass("previewcell "+colorSelected)
         $(this).data("color", colorValues[colorSelected].bin)
+        $(this).data("name", colorSelected)
     })
 
     $("#compute").on("click", computeSprite)
+    $("#save").on("click", saveSprite)
+    $("#load").on("click", function() {
+        $("#dialogLoad").dialog("open");
+    })
+    $("#import").on("click", loadSprite)
 
     $("#black").addClass("selected")
+
+    $("#dialogSave").dialog({
+        autoOpen: false,
+        width: 1000,
+        height: 500
+    });
+
+    $("#dialogLoad").dialog({
+        autoOpen: false,
+        width: 1000,
+        height: 700
+    });
 })
