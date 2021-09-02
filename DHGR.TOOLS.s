@@ -136,16 +136,6 @@ DHGR2_CLR   PHA
             BNE .24         ;in AUX memory
             RTS
 *--------------------------------------
-* Y in Y
-			.MA FINDY
-			LDA HTAB_LO,Y		;Find the low byte of the row address
-			STA SCRN_LO 
-			LDA HTAB_HI,Y		;Find the high byte of the row address
-			STA SCRN_HI
-			.EM
-*--------------------------------------
 MAN
 SAVE /DEV/TILES/SRC/DHGR.TOOLS.S
 TEXT /DEV/TILES/TXT/DHGR.TOOLS.S
-
-ASM

@@ -6,6 +6,8 @@ NEW
 *			.OR	$800
 *			.TF /DEV/TILES/OBJ/DEF
 *--------------------------------------
+STROBE		.EQ $C010
+
 GRAPHON     .EQ $C050
 HIRESON     .EQ $C057
 FULLON      .EQ $C052
@@ -27,5 +29,3 @@ CPT         .EQ $FE
 MAN
 SAVE /DEV/TILES/SRC/DEF.S
 TEXT /DEV/TILES/TXT/DEF.S
-
-ASM

@@ -21,69 +21,61 @@ INIT        STA GRAPHON         ;Turn on graphics
             STA ON80STOR        ;Use PAGE1/PAGE2 to switch between MAIN and AUX
             RTS
 *--------------------------------------
+PLAYER      .HS 00,00           ; Player X,Y
+*--------------------------------------
+CLRKBD      LDA #$00
+            STA $C000
+            STA $C010
+            RTS
+
+READKEYB    LDA $C000
+            BPL READKEYB
+            AND #$7F
+            STA STROBE
+            RTS
+
 RUN         JSR INIT
             LDA #$00
             JSR DHGR_CLR
 
+GAMELOOP    
             LDA #SPRITE
             STA SPRT_LO
             LDA /SPRITE
             STA SPRT_HI
-            LDA #$00
+            LDA PLAYER
             STA SPRT_X
-            LDA #$00            ; Coord Y du sprite
+            LDA PLAYER+1
             STA SPRT_Y
             JSR DRW_SPRITE
 
-            LDA #SPRITE2
+            LDA #SPRITE3
             STA SPRT_LO
-            LDA /SPRITE2
+            LDA /SPRITE3
             STA SPRT_HI
-            LDA #$00
+            LDA PLAYER
             STA SPRT_X
-            LDA #$00            ; Coord Y du sprite
+            LDA PLAYER+1
             STA SPRT_Y
             JSR DRW_SPRITE
 
-            LDA #SPRITE
-            STA SPRT_LO
-            LDA /SPRITE
-            STA SPRT_HI
             LDA #$00
             STA SPRT_X
-            LDA #$20            ; Coord Y du sprite
             STA SPRT_Y
-            JSR DRW_SPRITE
+            LDX #$40            ; Nb total de bytes
+            LDY #$10            ; Nb lignes
+            LDA #$04            ; Nb bytes par ligne
+            JSR DEL_ZONE
 
-;            LDA #$00
-;            LDY #$7C            ; Coord X du sprite
-;            JSR DIVMOD7YA
-;            ASL
-;            STA SPRT_X
-;            LDA #$01
-;            STA SPRT_X
-;            LDA #$10            ; Coord Y du sprite
-;            STA SPRT_Y
-;            JSR DRW_SPRITE
+;            JSR READKEYB
+;            BRK
+;            CMP #$51
+;            BEQ GAMELOOPEND
 ;
-;            LDA #$02
-;            STA SPRT_X
-;            LDA #$20            ; Coord Y du sprite
-;            STA SPRT_Y
-;            JSR DRW_SPRITE
-;
-;            LDA #$03
-;            STA SPRT_X
-;            LDA #$30            ; Coord Y du sprite
-;            STA SPRT_Y
-;            JSR DRW_SPRITE
-;
-;            LDA #$04
-;            STA SPRT_X
-;            LDA #$40            ; Coord Y du sprite
-;            STA SPRT_Y
-;            JSR DRW_SPRITE
-
+;            JMP GAMELOOP
+GAMELOOPEND
+            LDA #$03
+            JSR $FDED
             RTS
 *--------------------------------------
 MAN
