@@ -184,6 +184,102 @@ SPRITE3
 			.HS CC,33,4C,33
 			.HS CC,33,4C,33
 *--------------------------------------
+PLAYER
+* [["blck","blck","orge","orge","orge","blck","blck"],
+* ["blck","blck","pink","pink","pink","blck","blck"],
+* ["blck","blck","pink","pink","pink","blck","blck"],
+* ["blck","blck","blck","gry2","blck","blck","blck"],
+* ["blck","blck","ylow","ylow","ylow","blck","blck"],
+* ["blck","ylow","ylow","ylow","ylow","ylow","blck"],
+* ["blck","ylow","blck","ylow","blck","ylow","blck"],
+* ["ylow","ylow","blck","ylow","blck","ylow","ylow"],
+* ["ylow","blck","blck","ylow","blck","blck","ylow"],
+* ["pink","blck","gry2","gry2","gry2","blck","pink"],
+* ["blck","blck","mdbl","mdbl","mdbl","blck","blck"],
+* ["blck","blck","mdbl","blck","mdbl","blck","blck"],
+* ["blck","blck","mdbl","blck","mdbl","blck","blck"],
+* ["blck","blck","mdbl","blck","mdbl","blck","blck"],
+* ["blck","blck","mdbl","blck","mdbl","blck","blck"],
+* ["blck","blck","mdbl","blck","mdbl","blck","blck"]]
+			.HS 02,10,20
+			.HS 00,33
+			.HS 00,37
+			.HS 00,37
+			.HS 00,01
+			.HS 00,3B
+			.HS 60,3B
+			.HS 60,03
+			.HS 6E,03
+			.HS 0E,03
+			.HS 0D,15
+			.HS 00,0C
+			.HS 00,0C
+			.HS 00,0C
+			.HS 00,0C
+			.HS 00,0C
+			.HS 00,0C
+			.HS 98,00
+			.HS BA,00
+			.HS BA,00
+			.HS A0,00
+			.HS DC,00
+			.HS DD,07
+			.HS C1,07
+			.HS C1,77
+			.HS C0,70
+			.HS AA,68
+			.HS E6,00
+			.HS 86,00
+			.HS 86,00
+			.HS 86,00
+			.HS 86,00
+			.HS 86,00
+PLAYER2
+			.HS 02,10,20
+			.HS 00,04
+			.HS 00,1D
+			.HS 00,1D
+			.HS 00,02
+			.HS 00,0C
+			.HS 30,4C
+			.HS 30,40
+			.HS 33,40
+			.HS 03,00
+			.HS 07,2A
+			.HS 00,33
+			.HS 00,30
+			.HS 00,30
+			.HS 00,30
+			.HS 00,30
+			.HS 00,30
+			.HS A2,00
+			.HS EE,00
+			.HS EE,00
+			.HS C0,00
+			.HS E6,00
+			.HS E6,01
+			.HS E0,01
+			.HS E0,19
+			.HS E0,18
+			.HS D4,38
+			.HS 98,00
+			.HS 98,00
+			.HS 98,00
+			.HS 98,00
+			.HS 98,00
+			.HS 98,00
+*--------------------------------------
+LETTER_A
+			.HS 02,08,10
+			.DA #%10000000,#%00000000,#%00000000,#%00000000,#%00000000,#%00000000,#%00000000
+			.DA #%10000000,#%00001000,#%00001000,#%00001000,#%00001000,#%00001000,#%00000000
+			.DA #%10001000,#%00000000,#%00010100,#%00010100,#%00010100,#%00000000,#%00000000
+			.DA #%10000000,#%00000000,#%00000000,#%00010100,#%00010100,#%00111110,#%00010100
+			.DA #%10111110,#%00010100,#%00010100,#%00000000,#%00001000,#%00111100,#%00001010
+			.DA #%10011100,#%00101000,#%00011110,#%00001000,#%00000000,#%00000110,#%00100110
+			.DA #%10010000,#%00001000,#%00000100,#%00110010,#%00110000,#%00000000,#%00000100
+			.DA #%10001010,#%00001010,#%00000100,#%00101010,#%00010010,#%00101100,#%00000000
+*--------------------------------------
 MAN
 SAVE /DEV/TILES/SRC/GFXTABLES.S
 TEXT /DEV/TILES/TXT/GFXTABLES.S

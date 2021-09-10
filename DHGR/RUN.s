@@ -16,13 +16,27 @@ AUTO 4,1
 INIT        STA GRAPHON         ;Turn on graphics
             STA HIRESON         ;Turn on hi-res 
             STA FULLON          ;Turn on fullscreen
-            STA DHRON           ;Turn on DHR
+            STA AN3             ;Turn on DHR
             STA ON80COL         ;Turn on 80 columns
             STA ON80STOR        ;Use PAGE1/PAGE2 to switch between MAIN and AUX
             RTS
 *--------------------------------------
-PLAYER      .HS 00,00           ; Player X,Y
+			.MA WAITVBL
+:1			BIT VBL
+            BPL :1
+:2			BIT VBL
+            BMI :2
+            .EM
 *--------------------------------------
+PLAYER_DESC .HS 00,01           ; Player X,Y
+*--------------------------------------
+CORNER      LDA #%00001111
+            STA PAGE2
+            STA $2000
+            STA $2002
+            STA $2004
+            RTS
+
 CLRKBD      LDA #$00
             STA $C000
             STA $C010
@@ -37,42 +51,58 @@ READKEYB    LDA $C000
 RUN         JSR INIT
             LDA #$00
             JSR DHGR_CLR
-
+;            JSR CORNER
+    
 GAMELOOP    
-            LDA #SPRITE
+            LDA #PLAYER
             STA SPRT_LO
-            LDA /SPRITE
+            LDA /PLAYER
             STA SPRT_HI
-            LDA PLAYER
+            LDA PLAYER_DESC
             STA SPRT_X
-            LDA PLAYER+1
+            LDA PLAYER_DESC+1
             STA SPRT_Y
             JSR DRW_SPRITE
 
-            LDA #SPRITE3
-            STA SPRT_LO
-            LDA /SPRITE3
-            STA SPRT_HI
-            LDA PLAYER
-            STA SPRT_X
-            LDA PLAYER+1
-            STA SPRT_Y
-            JSR DRW_SPRITE
+;            LDA #$00
+;            STA SPRT_X
+;            STA SPRT_Y
+;            LDX #$10            ; Nb total de bytes
+;            LDY #$10            ; Nb lignes
+;            LDA #$01            ; Nb bytes par ligne
+;            JSR DEL_ZONE
 
-            LDA #$00
+            JSR READKEYB
+            CMP #$15
+            BEQ PLYR_RIGHT
+            CMP #$08
+            BEQ PLYR_LEFT
+            JMP GAMELOOP
+
+PLYR_RIGHT  LDA PLAYER_DESC
             STA SPRT_X
+            LDA PLAYER_DESC+1
             STA SPRT_Y
-            LDX #$40            ; Nb total de bytes
+            LDX #$20            ; Nb total de bytes
             LDY #$10            ; Nb lignes
-            LDA #$04            ; Nb bytes par ligne
+            LDA #$02            ; Nb bytes par ligne
             JSR DEL_ZONE
+            INC PLAYER_DESC
+            JMP GAMELOOP
 
-;            JSR READKEYB
-;            BRK
-;            CMP #$51
-;            BEQ GAMELOOPEND
-;
-;            JMP GAMELOOP
+PLYR_LEFT   LDA #$02
+            CLC
+            ADC PLAYER_DESC
+            STA SPRT_X
+            LDA PLAYER_DESC+1
+            STA SPRT_Y
+            LDX #$20            ; Nb total de bytes
+            LDY #$10            ; Nb lignes
+            LDA #$02            ; Nb bytes par ligne
+            JSR DEL_ZONE
+            DEC PLAYER_DESC
+            JMP GAMELOOP
+
 GAMELOOPEND
             LDA #$03
             JSR $FDED

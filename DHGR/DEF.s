@@ -11,7 +11,7 @@ STROBE		.EQ $C010
 GRAPHON     .EQ $C050
 HIRESON     .EQ $C057
 FULLON      .EQ $C052
-DHRON       .EQ $C05E
+AN3         .EQ $C05E
 ON80STOR    .EQ $C001
 ON80COL     .EQ $C00D
 PAGE1       .EQ $C054
@@ -25,6 +25,7 @@ SPRT_HI		.EQ $FB
 SPRT_X		.EQ $FC
 SPRT_Y		.EQ $FD
 CPT         .EQ $FE
+VBL			.EQ	$C019
 *--------------------------------------
 MAN
 SAVE /DEV/TILES/SRC/DEF.S

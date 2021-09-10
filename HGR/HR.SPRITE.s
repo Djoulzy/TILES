@@ -1,0 +1,100 @@
+NEW
+    
+AUTO 4,1
+            .OP	65C02
+            .LIST OFF
+*			.OR	$800
+*			.TF /DEV/TILES.HR/OBJ/HR.SPRITE
+*--------------------------------------
+* Y in Y
+			.MA FINDY
+			LDA HTAB_LO,Y		;Find the low byte of the row address
+			STA SCRN_LO 
+			LDA HTAB_HI,Y		;Find the high byte of the row address
+			STA SCRN_HI
+			.EM
+*--------------------------------------
+; Coord zone -> SPRT_X, SPRT_Y
+; Nb total de bytes -> X
+; Nb lignes -> Y
+; Nb bytes par ligne -> A
+DEL_ZONE
+            CLC
+            ADC SPRT_X
+			STA .02+1
+
+			TYA
+            CLC
+            ADC SPRT_Y
+            STA SPRT_Y
+
+.01			DEC SPRT_Y
+            LDY SPRT_Y          ; On cherche la position memoire de Y
+            >FINDY
+
+.02			LDY #$AA
+
+.03			DEX
+            BMI END_DEL_ZONE
+            DEY
+            LDA #$00
+            STA PAGE2           ; Bascule vers AUX
+            STA (SCRN_LO),Y
+            STA PAGE1           ; Bascule vers MAIN
+            STA (SCRN_LO),Y
+			CPY SPRT_X
+            BEQ .01				; Fin d'une ligne
+            JMP .03
+
+END_DEL_ZONE
+            RTS
+*--------------------------------------
+; Coord sprite -> SPRT_X, SPRT_Y
+; Data du sprite dans SPRT_LO, SPRT_HI
+; 
+; Les 3 premier byte du sprite sont :
+; nb bytes sur 1 ligne / nb lignes / nb total de bytes
+DRW_SPRITE
+            LDA #$03            ; On va réécrire le code en AA avec l'adresse du sprite
+            CLC                 ; à laquelle on ajoute le nb de byte par ligne
+            ADC SPRT_LO         ; On evite de lire directement l'adresse du sprite pour    
+            STA .3+1            ; ne pas manipuler inutilement la pile
+            LDA #$00            ; On additionne 3 pour sauté les byte qui definissent sa taille
+            ADC SPRT_HI
+            STA .3+2            ; L'adresse AA devient : LDA SPRITE+3,X
+
+            LDY #$02
+            LDA (SPRT_LO),Y     ; 
+            TAX                 ; Compteur du nombre de bytes composant le sprite
+
+            LDY #$01            ; On recupère le nb de ligne du sprite
+            LDA (SPRT_LO),Y     ; On ajoute le nombre de ligne du sprite à la pos Y de départ
+            CLC
+            ADC SPRT_Y
+            STA SPRT_Y
+
+.01			DEC SPRT_Y
+            LDY SPRT_Y          ; On cherche la position memoire de Y
+            >FINDY
+
+            LDY #$00
+            LDA (SPRT_LO),Y     ; Compteur du nombre de byte par ligne
+            CLC
+            ADC SPRT_X          ; On place dans Y la position Xorigine + Compteur
+            TAY
+
+.02			DEX
+            BMI END_DRW_SPRITE
+            DEY
+.03			LDA $AAAA,X
+            STA (SCRN_LO),Y
+            BMI	.01
+            JMP	.02
+
+END_DRW_SPRITE
+            RTS
+*--------------------------------------
+MAN
+SAVE /DEV/TILES.HR/SRC/HR.SPRITE.S
+TEXT /DEV/TILES.HR/TXT/HR.SPRITE.S
+

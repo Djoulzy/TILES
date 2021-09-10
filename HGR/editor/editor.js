@@ -1,22 +1,11 @@
 var colorValues = {
-    blck: {val: 0, bin: "0000"},
-    dkbl: {val: 1, bin: "0001"},
-    dkgr: {val: 2, bin: "0010"},
-    mdbl: {val: 3, bin: "0011"},
-    brwn: {val: 4, bin: "0100"},
-    gry2: {val: 5, bin: "0101"},
-    gren: {val: 6, bin: "0110"},
-    aqua: {val: 7, bin: "0111"},
-    mgnt: {val: 8, bin: "1000"},
-    vilt: {val: 9, bin: "1001"},
-    gry1: {val: 10, bin: "1010"},
-    ltbl: {val: 11, bin: "1011"},
-    orge: {val: 12, bin: "1100"},
-    pink: {val: 13, bin: "1101"},
-    ylow: {val: 14, bin: "1110"},
-    whte: {val: 15, bin: "1111"},
+    blck: {bin: "00"},
+    col1: {bin: "01"}, 
+    col2: {bin: "10"},
+    whte: {bin: "11"},
 }
 var colorSelected = "blck"
+var paletteSelected = "0"
 var pictoWidth = 0
 var pictoHeight = 0
 
@@ -31,12 +20,13 @@ function displayDrawZone(width, height) {
     pictoWidth = width
     pictoHeight = height
 
-    var cpt = 1;
+    var cpt = 0;
     document.write('<table class="drawzone">')
     for(let y = 1; y <= height; y++) {
         document.write('    <tr>')
         for(let x = 1; x <= width; x++) {
-            document.write('        <td id="'+cpt+'" class="drawcell blck" data-color="0000" data-name="blck"></td>')
+            let byte = Math.trunc(cpt/3.5)
+            document.write('        <td id="'+cpt+'" class="drawcell p0 blck" data-palette="0" data-color="00" data-name="blck">'+byte+'</td>')
             cpt++
         }
         document.write('    </tr>')
@@ -45,12 +35,12 @@ function displayDrawZone(width, height) {
 }
 
 function displayPreview() {
-    var cpt = 1;
+    var cpt = 0;
     document.write('<table class="preview" cellspacing="0" cellpadding="0">')
     for(let y = 1; y <= pictoHeight; y++) {
         document.write('    <tr>')
         for(let x = 1; x <= pictoWidth; x++) {
-            document.write('        <td id="p'+cpt+'" class="previewcell blck"></td>')
+            document.write('        <td id="p'+cpt+'" class="previewcell p0 blck"></td>')
             cpt++
         }
         document.write('    </tr>')
@@ -60,11 +50,12 @@ function displayPreview() {
 
 function displayPalette() {
     document.write('<table class="palette">')
-    for (const [key, value] of Object.entries(colorValues)) {
-        document.write('\t<tr>')
-        document.write('\t\t<td id="'+key+'" class="paletteCell '+key+'"></td>')
-        document.write('\t</tr>')
-    }
+    document.write('\t<tr><td id="p0blck" class="paletteCell p0 blck" data-color="blck"></td></tr>')
+    document.write('\t<tr><td id="p0col1" class="paletteCell p0 col1" data-palette="0" data-color="col1"></td></tr>')
+    document.write('\t<tr><td id="p0col2" class="paletteCell p0 col2" data-palette="0" data-color="col2"></td></tr>')
+    document.write('\t<tr><td id="p1col1" class="paletteCell p1 col1" data-palette="1" data-color="col1"></td></tr>')
+    document.write('\t<tr><td id="p1col2" class="paletteCell p1 col2" data-palette="1" data-color="col2"></td></tr>')
+    document.write('\t<tr><td id="p0whte" class="paletteCell p0 whte" data-color="whte"></td></tr>')
     document.write('</table>')
 }
 
@@ -77,26 +68,21 @@ function displayResult(output) {
     if (format == 'bin') prefix = ".DA "
     else prefix = ".HS "
     for(let y = 0; y<output.length; y++) {
-        var aux = new Array
         var main = new Array
-        for(let x = 0; x<output[y].length; x += 2) {
+        for(let x = 0; x<output[y].length; x += 1) {
             if (format == 'bin') {
-                aux.push("#%" + output[y][x])
-                main.push("#%" + output[y][x+1])
+                main.push("#%" + output[y][x])
             } else {
-                aux.push(parseInt(output[y][x], 2).toString(16).padStart(2, '0').toUpperCase())
-                main.push(parseInt(output[y][x+1], 2).toString(16).padStart(2, '0').toUpperCase())
+                main.push(parseInt(output[y][x], 2).toString(16).padStart(2, '0').toUpperCase())
             }
         }
-        out_aux += prefix + aux.join(",") + "<br/>"
         out_main += prefix + main.join(",") + "<br/>"
     }
     let pixWidth = (pictoWidth / 7) * 2
-    out_aux = ".HS " + pixWidth.toString(16).padStart(2, '0').toUpperCase()
+    out_main = ".HS " + pixWidth.toString(16).padStart(2, '0').toUpperCase()
         + "," + pictoHeight.toString(16).padStart(2, '0').toUpperCase()
         + "," + (pictoHeight*pixWidth).toString(16).padStart(2, '0').toUpperCase()
-        + "<br/>" + out_aux
-    $("#output_aux").html(out_aux)
+        + "<br/>" + out_main
     $("#output_main").html(out_main)
 }
 
@@ -104,43 +90,27 @@ function swapBytes(line) {
     var tmp = 0
     var binaries = new Array
     for(let x = 0; x<line.length; x += 2) {
-        console.log(x)
         tmp = (line[x+1] << 4) | line[x]
         binaries.push(tmp)
     }
     return binaries
 }
 
-function invertAndComplete(line) {
+function invertAndComplete(line, id) {
     var binaries = new Array
+    console.log(id)
     for(let x = 0; x<line.length; x += 7) {
         var tmp = ""
         for(let cpt = 0; cpt<7; cpt++) {
-            tmp = line[x+cpt] + tmp
+            if (cpt == 3) {
+                tmp = line[x+cpt][0] + $("#"+(id-6)).data("palette") + line[x+cpt][1] + tmp
+            }
+            else tmp = line[x+cpt] + tmp
         }
+        tmp = $("#"+id).data("palette") + tmp
+        //tmp = "0000000000000000" + tmp
         binaries.push(tmp)
     }
-    // console.log(binaries)
-    return binaries
-}
-
-function addPaletteBit(lines) {
-    var binaries = new Array
-    lines.forEach(function(val, index) {
-        let cpt = 6
-        let tmp = ""
-        for(let x = 0; x<val.length; x++) {
-            cpt++
-            if (cpt > 6) {
-                if ((index == 0) && (x < 16) && (x > 8)) tmp += "1"
-                else tmp += "0"
-                cpt = 0
-            }
-            tmp += val[x]
-            console.log(index, x, val[x])
-        }
-        binaries.push(tmp)
-    })
     // console.log(binaries)
     return binaries
 }
@@ -154,7 +124,7 @@ function extractBytes(lines) {
         }
         binaries = binaries.concat(tmp.reverse())
     })
-    // console.log(binaries)
+    console.log(binaries)
     return binaries
 }
 
@@ -167,8 +137,7 @@ function computeSprite() {
         output[line][cpt] = $(this).data("color")
         cpt++
         if (cpt == pictoWidth) {
-            output[line] = invertAndComplete(output[line])
-            output[line] = addPaletteBit(output[line])
+            output[line] = invertAndComplete(output[line], index)
             output[line] = extractBytes(output[line])
     
             line++
@@ -192,7 +161,6 @@ function saveSprite() {
             cpt = 0
         }
     })
-    console.log(output)
 
     let content = JSON.stringify(output)
     $("#dialogSave").html(content)
@@ -205,7 +173,6 @@ function loadSprite() {
     var cpt = 1
     data.forEach(function(lines) {
         lines.forEach(function(cols) {
-            console.log(cols)
             colorSelected = cols
             $("#"+cpt).trigger("click")
             cpt++
@@ -213,10 +180,31 @@ function loadSprite() {
     })
 }
 
+function changePalette(x) {
+    let byte = Math.trunc(parseInt(x)/3.5)
+    let first = Math.trunc(byte*3.5)
+    let last = Math.trunc(byte*3.5+3.5)
+    console.log(first, last)
+    let invert = Math.abs(paletteSelected - 1)
+    for(let i = first; i<last; i++) {
+        $("#"+i).removeClass("p"+invert)
+        $("#"+i).addClass("p"+paletteSelected)
+        $("#"+i).data("palette", paletteSelected)
+        $("#p"+i).removeClass("p"+invert)
+        $("#p"+i).addClass("p"+paletteSelected)
+        $("#p"+i).data("palette", paletteSelected)
+    }
+}
+
 $(document).ready(function() {
     $(".paletteCell").on("click", function() {
-        $("#"+colorSelected).removeClass("selected")
-        colorSelected = $(this).attr("id")
+        let precedent = 0
+        if ((colorSelected == "blck") || (colorSelected == "whte")) precedent = "p0"+colorSelected
+        else precedent = "p"+paletteSelected+colorSelected
+        $("#"+precedent).removeClass("selected")
+        colorSelected = $(this).data("color")
+        paletteSelected = $(this).data("palette")
+        if (!isset(paletteSelected)) paletteSelected = 0
         $(this).addClass("selected")
     })
 
@@ -224,10 +212,12 @@ $(document).ready(function() {
         let previewId = "#p" + $(this).attr("id")
         $(this).removeClass()
         $(previewId).removeClass()
-        $(this).addClass("drawcell "+colorSelected)
-        $(previewId).addClass("previewcell "+colorSelected)
+
+        $(this).addClass("drawcell p"+paletteSelected+" "+colorSelected)
+        $(previewId).addClass("previewcell p"+paletteSelected+" "+colorSelected)
         $(this).data("color", colorValues[colorSelected].bin)
         $(this).data("name", colorSelected)
+        if (paletteSelected != $(this).data("palette")) changePalette($(this).attr("id"))
     })
 
     $("#compute").on("click", computeSprite)

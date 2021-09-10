@@ -37,7 +37,7 @@ DEL_ZONE
 .03			DEX
             BMI END_DEL_ZONE
             DEY
-            LDA #$FF
+            LDA #$00
             STA PAGE2           ; Bascule vers AUX
             STA (SCRN_LO),Y
             STA PAGE1           ; Bascule vers MAIN
@@ -89,6 +89,10 @@ DRW_SPRITE
             CLC
             ADC SPRT_X          ; On place dans Y la position Xorigine + Compteur
             TAY
+
+;            LDY SPRT_X
+;            LDA (SPRT_LO),Y
+;            TAY
 
 .02			DEX
             BMI END_DRW_SPRITE
