@@ -64,7 +64,7 @@ DRW_SPRITE
             STA .3+2            ; L'adresse AA devient : LDA SPRITE+3,X
 
             LDY #$02
-            LDA (SPRT_LO),Y     ; 
+            LDA (SPRT_LO),Y     ; Meme chose pour les données du sprite pour la zone MAIN
             TAX                 ; Compteur du nombre de bytes composant le sprite
 
             LDY #$01            ; On recupère le nb de ligne du sprite
@@ -75,19 +75,23 @@ DRW_SPRITE
 
 .01			DEC SPRT_Y
             LDY SPRT_Y          ; On cherche la position memoire de Y
-            >FINDY
-
-            LDY #$00
-            LDA (SPRT_LO),Y     ; Compteur du nombre de byte par ligne
+			LDA HTAB_HI,Y		; Find the high byte of the row address
+			STA SCRN_HI
+			LDA HTAB_LO,Y		; Find the low byte of the row address
             CLC
-            ADC SPRT_X          ; On place dans Y la position Xorigine + Compteur
-            TAY
+            ADC SPRT_X
+			STA SCRN_LO         ; Contient l'addresse du début de ligne
+
+            LDY #$00            ; Mise en place du compteur de byte par ligne
+            LDA (SPRT_LO),Y     
+            TAY                 ; Y sert de compteur
+            DEY
 
 .02			DEX
             BMI END_DRW_SPRITE
-            DEY
 .03			LDA $AAAA,X
             STA (SCRN_LO),Y
+            DEY
             BMI	.01
             JMP	.02
 

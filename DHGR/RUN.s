@@ -54,15 +54,17 @@ RUN         JSR INIT
 ;            JSR CORNER
     
 GAMELOOP    
-            LDA #PLAYER
+            LDA #LETTER_A
             STA SPRT_LO
-            LDA /PLAYER
+            LDA /LETTER_A
             STA SPRT_HI
             LDA PLAYER_DESC
             STA SPRT_X
             LDA PLAYER_DESC+1
             STA SPRT_Y
+            STA AN3
             JSR DRW_SPRITE
+            STA AN3
 
 ;            LDA #$00
 ;            STA SPRT_X

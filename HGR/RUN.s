@@ -27,23 +27,6 @@ INIT        STA GRAPHON         ;Turn on graphics
 *--------------------------------------
 PLAYER_DESC .HS 00,01           ; Player X,Y
 *--------------------------------------
-CORNER      LDA #%00110011
-            STA $2000
-            STA $2001
-            STA $2002
-
-            LDA #%01001100
-            STA $2400
-            STA $2401
-            STA $2402
-            RTS
-
-TEST        LDA #%00101010
-            STA $2000
-            LDA #%10000001
-            STA $2001
-            RTS
-
 CLRKBD      LDA #$00
             STA $C000
             STA $C010
@@ -58,8 +41,17 @@ READKEYB    LDA $C000
 RUN         JSR INIT
             LDA #$00
             JSR HR_CLR
-;            JSR CORNER
-            JSR TEST
+
+GAMELOOP    
+            LDA #LETTER_A
+            STA SPRT_LO
+            LDA /LETTER_A
+            STA SPRT_HI
+            LDA PLAYER_DESC
+            STA SPRT_X
+            LDA PLAYER_DESC+1
+            STA SPRT_Y
+            JSR DRW_SPRITE
 
 ;            LDA #LETTER_A
 ;            STA SPRT_LO
