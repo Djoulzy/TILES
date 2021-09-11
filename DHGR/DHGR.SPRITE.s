@@ -69,10 +69,10 @@ DRW_SPRITE
             CLC                 ; Du coup on lui additionne le nb total de byte de la zone AUX
             ADC #$03
             ADC SPRT_LO         ; pour trouver le debut des data
-            STA .4+1
+            STA .5+1
             LDA #$00
             ADC SPRT_HI
-            STA .4+2            ; L'adresse BB devient : LDA SPRITE+nb+3,X
+            STA .5+2            ; L'adresse BB devient : LDA SPRITE+nb+3,X
 
             LDY #$01            ; On recupère le nb de ligne du sprite
             LDA (SPRT_LO),Y     ; On ajoute le nombre de ligne du sprite à la pos Y de départ
@@ -83,14 +83,16 @@ DRW_SPRITE
 .01			DEC SPRT_Y
             LDY SPRT_Y          ; On cherche la position memoire de Y
 			LDA HTAB_HI,Y		; Find the high byte of the row address
-			STA SCRN_HI
+            STA .4+2            ; On réecrit l'instruction .4 et .6 pour placer
+            STA .6+2            ; l'adresse du début de ligne 
 			LDA HTAB_LO,Y		; Find the low byte of the row address
             CLC
             ADC SPRT_X
-			STA SCRN_LO         ; Contient l'addresse du début de ligne
+            STA .4+1            ; On réecrit l'instruction .4 et .6 pour placer
+            STA .6+1            ; l'adresse du début de ligne 
 
             LDY #$00            ; Mise en place du compteur de byte par ligne
-            LDA (SPRT_LO),Y     
+            LDA (SPRT_LO),Y 
             TAY                 ; Y sert de compteur
             DEY
 
@@ -98,10 +100,10 @@ DRW_SPRITE
             BMI END_DRW_SPRITE
 .03			LDA $AAAA,X
             STA PAGE2           ; Bascule vers AUX
-            STA (SCRN_LO),Y
-.04			LDA $BBBB,X
+.04         STA $AAAA,Y         ; STA (SCRN_LO),Y
+.05			LDA $BBBB,X
             STA PAGE1           ; Bascule vers MAIN
-            STA (SCRN_LO),Y
+.06         STA $AAAA,Y         ; STA (SCRN_LO),Y
             DEY
             BMI	.01
             JMP	.02

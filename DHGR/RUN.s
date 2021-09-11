@@ -28,7 +28,7 @@ INIT        STA GRAPHON         ;Turn on graphics
             BMI :2
             .EM
 *--------------------------------------
-PLAYER_DESC .HS 00,01           ; Player X,Y
+PLAYER_DESC .HS 00,00           ; Player X,Y
 *--------------------------------------
 CORNER      LDA #%00001111
             STA PAGE2
@@ -48,59 +48,71 @@ READKEYB    LDA $C000
             STA STROBE
             RTS
 
+DEL_PLAYER  LDA PLAYER_DESC
+            STA SPRT_X
+            LDA PLAYER_DESC+1
+            STA SPRT_Y
+            LDX #$50         
+            LDY #$28         
+            LDA #$02         
+            JSR DEL_ZONE
+            RTS
+
 RUN         JSR INIT
             LDA #$00
             JSR DHGR_CLR
 ;            JSR CORNER
-    
+
 GAMELOOP    
-            LDA #PLAYER
+            LDA #01
+            BIT PLAYER_DESC
+            BEQ .1
+            LDA #PLAYER2
+            STA SPRT_LO
+            LDA /PLAYER2
+            STA SPRT_HI
+            JMP .2
+.1          LDA #PLAYER
             STA SPRT_LO
             LDA /PLAYER
             STA SPRT_HI
-            LDA PLAYER_DESC
+.2          LDA PLAYER_DESC
             STA SPRT_X
             LDA PLAYER_DESC+1
             STA SPRT_Y
             JSR DRW_SPRITE
-
-;            LDA #$00
-;            STA SPRT_X
-;            STA SPRT_Y
-;            LDX #$10            ; Nb total de bytes
-;            LDY #$10            ; Nb lignes
-;            LDA #$01            ; Nb bytes par ligne
-;            JSR DEL_ZONE
 
             JSR READKEYB
             CMP #$15
             BEQ PLYR_RIGHT
             CMP #$08
             BEQ PLYR_LEFT
+            CMP #$0A
+            BEQ PLYR_DOWN
+            CMP #$0B
+            BEQ PLYR_UP
             JMP GAMELOOP
 
-PLYR_RIGHT  LDA PLAYER_DESC
-            STA SPRT_X
-            LDA PLAYER_DESC+1
-            STA SPRT_Y
-            LDX #$20            ; Nb total de bytes
-            LDY #$10            ; Nb lignes
-            LDA #$02            ; Nb bytes par ligne
-            JSR DEL_ZONE
+PLYR_RIGHT  JSR DEL_PLAYER
             INC PLAYER_DESC
             JMP GAMELOOP
 
-PLYR_LEFT   LDA #$02
-            CLC
-            ADC PLAYER_DESC
-            STA SPRT_X
-            LDA PLAYER_DESC+1
-            STA SPRT_Y
-            LDX #$20            ; Nb total de bytes
-            LDY #$10            ; Nb lignes
-            LDA #$02            ; Nb bytes par ligne
-            JSR DEL_ZONE
+PLYR_LEFT   JSR DEL_PLAYER
             DEC PLAYER_DESC
+            JMP GAMELOOP
+
+PLYR_DOWN   JSR DEL_PLAYER
+            INC PLAYER_DESC+1
+            INC PLAYER_DESC+1
+            INC PLAYER_DESC+1
+            INC PLAYER_DESC+1
+            JMP GAMELOOP
+
+PLYR_UP     JSR DEL_PLAYER
+            DEC PLAYER_DESC+1
+            DEC PLAYER_DESC+1
+            DEC PLAYER_DESC+1
+            DEC PLAYER_DESC+1
             JMP GAMELOOP
 
 GAMELOOPEND

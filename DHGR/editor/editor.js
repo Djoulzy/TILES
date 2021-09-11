@@ -7,7 +7,6 @@ var colorValues = {
     gry2: {val: 5, bin: "0101"},
     gren: {val: 6, bin: "0110"},
     aqua: {val: 7, bin: "0111"},
-    mgnt: {val: 8, bin: "1000"},
     vilt: {val: 9, bin: "1001"},
     gry1: {val: 10, bin: "1010"},
     ltbl: {val: 11, bin: "1011"},
@@ -16,6 +15,25 @@ var colorValues = {
     ylow: {val: 14, bin: "1110"},
     whte: {val: 15, bin: "1111"},
 }
+
+var altColorValues = {
+    blck: {val: 0, bin: "0000"},
+    dkbl: {val: 1, bin: "0100"},
+    dkgr: {val: 2, bin: "0010"},
+    mdbl: {val: 3, bin: "1100"},
+    brwn: {val: 4, bin: "0001"},
+    gry2: {val: 5, bin: "0101"},
+    gren: {val: 6, bin: "1001"},
+    aqua: {val: 7, bin: "1101"},
+    vilt: {val: 9, bin: "0110"},
+    gry1: {val: 10, bin: "1010"},
+    ltbl: {val: 11, bin: "1110"},
+    orge: {val: 12, bin: "0011"},
+    pink: {val: 13, bin: "0111"},
+    ylow: {val: 14, bin: "1011"},
+    whte: {val: 15, bin: "1111"},
+}
+
 var colorSelected = "blck"
 var pictoWidth = 0
 var pictoHeight = 0
@@ -92,22 +110,11 @@ function displayResult(output) {
         out_main += prefix + main.join(",") + "<br/>"
     }
     let pixWidth = (pictoWidth / 7) * 2
-    out_aux = ".HS " + pixWidth.toString(16).padStart(2, '0').toUpperCase()
+    let out  = ".HS " + pixWidth.toString(16).padStart(2, '0').toUpperCase()
         + "," + pictoHeight.toString(16).padStart(2, '0').toUpperCase()
         + "," + (pictoHeight*pixWidth).toString(16).padStart(2, '0').toUpperCase()
-        + "<br/>" + out_aux
-    $("#output_aux").html(out_aux)
-    $("#output_main").html(out_main)
-}
-
-function swapBytes(line) {
-    var tmp = 0
-    var binaries = new Array
-    for(let x = 0; x<line.length; x += 2) {
-        tmp = (line[x+1] << 4) | line[x]
-        binaries.push(tmp)
-    }
-    return binaries
+        + "<br/>" + out_aux + out_main
+    $("#output").html(out)
 }
 
 function invertAndComplete(line) {
@@ -122,6 +129,24 @@ function invertAndComplete(line) {
     }
     console.log(binaries)
     return binaries
+}
+
+function invertAndCompleteAlt(line) {
+    var binaries = new Array
+    for(let x = 0; x<line.length; x += 7) {
+        var tmp = ""
+        for(let cpt = 0; cpt<7; cpt++) {
+            tmp = line[x+cpt] + tmp
+        }
+        //tmp = "0000000000000000" + tmp
+        tmp += "00"
+        tmp = tmp.substr(2)
+        binaries.push(tmp)
+    }
+    console.log(binaries)
+    return binaries
+    // 000000000000000000000000111100
+    // 0000000000000000000000001111
 }
 
 function addPaletteBit(lines) {
@@ -168,7 +193,7 @@ function computeSprite() {
         output[line][cpt] = $(this).data("color")
         cpt++
         if (cpt == pictoWidth) {
-            output[line] = invertAndComplete(output[line])
+            output[line] = invertAndCompleteAlt(output[line])
             output[line] = addPaletteBit(output[line])
             output[line] = extractBytes(output[line])
     
