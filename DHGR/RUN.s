@@ -16,7 +16,7 @@ AUTO 4,1
 INIT        STA GRAPHON         ;Turn on graphics
             STA HIRESON         ;Turn on hi-res 
             STA FULLON          ;Turn on fullscreen
-            STA AN3             ;Turn on DHR
+            LDA AN3             ;Turn on DHR
             STA ON80COL         ;Turn on 80 columns
             STA ON80STOR        ;Use PAGE1/PAGE2 to switch between MAIN and AUX
             RTS
@@ -54,17 +54,15 @@ RUN         JSR INIT
 ;            JSR CORNER
     
 GAMELOOP    
-            LDA #LETTER_A
+            LDA #PLAYER
             STA SPRT_LO
-            LDA /LETTER_A
+            LDA /PLAYER
             STA SPRT_HI
             LDA PLAYER_DESC
             STA SPRT_X
             LDA PLAYER_DESC+1
             STA SPRT_Y
-            STA AN3
             JSR DRW_SPRITE
-            STA AN3
 
 ;            LDA #$00
 ;            STA SPRT_X

@@ -1,0 +1,133 @@
+body {
+    font-family:'Courier New', Courier, monospace;
+}
+
+div.inline { float:left; }
+.clearBoth { clear:both; }
+
+.drawzone {
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+.drawcell {
+    width: 30px;
+    height: 30px;
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+.preview { /* Ration 1.78 */
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+.previewcell {
+    width: 8px;
+    height: 4px;
+}
+
+.palette {
+    width: 100px;
+    height: 400px;
+}
+
+.paletteCell {
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+.paletteCell.selected {
+    border-width:3px; 
+    border-style:solid; 
+    border-color:red;
+}
+
+#dialogSave {
+    font-family:'Courier New', Courier, monospace;
+    font-weight: bolder;
+    font-size: small;
+}
+
+.title {
+    font-weight: bolder;
+}
+
+.output {
+    font-family:'Courier New', Courier, monospace;
+    width: 500px;
+    height: 350px;
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+    background-color: rgb(230, 230, 230);
+    margin: 5px;
+}
+
+.blck {
+    background-color: black;
+}
+
+.whte {
+    background-color: white;
+}
+
+.mgnt {
+    background-color: #970A74
+}
+
+.brwn {
+    background-color: #756B36
+}
+
+.orge {
+    background-color: #F85815
+}
+
+.dkgr {
+    background-color: #007108
+}
+
+.gry1 {
+    background-color: #787A7A
+}
+
+.gren {
+    background-color: #44CA00
+}
+
+.ylow {
+    background-color: #DACB1B
+}
+
+.dkbl {
+    background-color: #2134D1
+}
+
+.vilt {
+    background-color: #C735FE
+}
+
+.gry2 {
+    background-color: #797274
+}
+
+.pink {
+    background-color: #FE8DDC
+}
+
+.mdbl {
+    background-color: #03B6EE
+}
+
+.ltbl {
+    background-color: #ADDEFF
+}
+
+.aqua {
+    background-color: #72E7CB
+}

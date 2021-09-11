@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr-fr">
+    <head>
+        <meta charset='utf-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.css">
+        <link rel="stylesheet" href="editor.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+        <script src="editor.js"></script>
+    </head>
+    <body>
+        <div>
+            <div class="inline"><script>displayDrawZone(14, 8)</script></div>
+            <div class="inline">
+                <script>displayPalette()</script>
+                <input name="format" type="radio" value="bin" />Binary
+                <input name="format" type="radio" value="hexa" checked />Hexa
+                <br/>
+                <input id="compute" type="button" value="Compute" />
+                <input id="save" type="button" value="Save" />
+                <input id="load" type="button" value="Load" />
+            </div>
+            <div class="inline"><script>displayPreview()</script></div>
+        </div>
+        <div class="clearBoth"><br/></div>
+        <div class="clearBoth">
+            <div class="inline">
+                <span class="title">Output</span>
+                <div id="output" class="output"></div>
+            </div>
+        </div>
+        <div id="dialogSave" title="Save"></div>
+        <div id="dialogLoad" title="Load">
+            <textarea id="importData" autofocus="true" rows="20" cols="80"></textarea>
+            <input id="import" type="button" value="Import" />
+        </div>
+    </body>
+</html>

@@ -1,20 +1,6 @@
 var colorValues = {
-    blck: {val: 0, bin: "0000"},
-    dkbl: {val: 1, bin: "0001"},
-    dkgr: {val: 2, bin: "0010"},
-    mdbl: {val: 3, bin: "0011"},
-    brwn: {val: 4, bin: "0100"},
-    gry2: {val: 5, bin: "0101"},
-    gren: {val: 6, bin: "0110"},
-    aqua: {val: 7, bin: "0111"},
-    mgnt: {val: 8, bin: "1000"},
-    vilt: {val: 9, bin: "1001"},
-    gry1: {val: 10, bin: "1010"},
-    ltbl: {val: 11, bin: "1011"},
-    orge: {val: 12, bin: "1100"},
-    pink: {val: 13, bin: "1101"},
-    ylow: {val: 14, bin: "1110"},
-    whte: {val: 15, bin: "1111"},
+    blck: {val: 0, bin: "0"},
+    whte: {val: 15, bin: "1"},
 }
 var colorSelected = "blck"
 var pictoWidth = 0
@@ -36,7 +22,7 @@ function displayDrawZone(width, height) {
     for(let y = 1; y <= height; y++) {
         document.write('    <tr>')
         for(let x = 1; x <= width; x++) {
-            document.write('        <td id="'+cpt+'" class="drawcell blck" data-color="0000" data-name="blck"></td>')
+            document.write('        <td id="'+cpt+'" class="drawcell blck" data-color="0" data-name="blck"></td>')
             cpt++
         }
         document.write('    </tr>')
@@ -92,12 +78,11 @@ function displayResult(output) {
         out_main += prefix + main.join(",") + "<br/>"
     }
     let pixWidth = (pictoWidth / 7) * 2
-    out_aux = ".HS " + pixWidth.toString(16).padStart(2, '0').toUpperCase()
+    let out  = ".HS " + pixWidth.toString(16).padStart(2, '0').toUpperCase()
         + "," + pictoHeight.toString(16).padStart(2, '0').toUpperCase()
         + "," + (pictoHeight*pixWidth).toString(16).padStart(2, '0').toUpperCase()
-        + "<br/>" + out_aux
-    $("#output_aux").html(out_aux)
-    $("#output_main").html(out_main)
+        + "<br/>" + out_aux + out_main
+    $("#output").html(out)
 }
 
 function swapBytes(line) {
