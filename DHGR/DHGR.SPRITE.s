@@ -101,7 +101,7 @@ DRW_SPRITE
 .03			LDA $AAAA,X
             STA PAGE2           ; Bascule vers AUX
 .04         STA $AAAA,Y         ; STA (SCRN_LO),Y
-.05			LDA $BBBB,X
+.05			LDA $AAAA,X
             STA PAGE1           ; Bascule vers MAIN
 .06         STA $AAAA,Y         ; STA (SCRN_LO),Y
             DEY

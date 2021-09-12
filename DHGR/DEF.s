@@ -6,7 +6,8 @@ NEW
 *			.OR	$800
 *			.TF /DEV/TILES/OBJ/DEF
 *--------------------------------------
-STROBE		.EQ $C010
+KBDSTRB		.EQ $C010
+KBD         .EQ $C000
 
 GRAPHON     .EQ $C050
 HIRESON     .EQ $C057

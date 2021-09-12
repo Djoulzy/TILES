@@ -29,41 +29,57 @@ INIT        STA GRAPHON         ;Turn on graphics
             .EM
 *--------------------------------------
 PLAYER_DESC .HS 00,00           ; Player X,Y
+OBJECT_DESC .HS 00,00
 *--------------------------------------
-CORNER      LDA #%00001111
-            STA PAGE2
-            STA $2000
-            STA $2002
-            STA $2004
-            RTS
 
-CLRKBD      LDA #$00
-            STA $C000
-            STA $C010
-            RTS
-
-READKEYB    LDA $C000
-            BPL READKEYB
+READKEYB    BIT KBD
+            BPL .1
+            LDA KBD
+            BIT KBDSTRB
             AND #$7F
-            STA STROBE
+.1          RTS
+
+DEL_OBJECT  LDA OBJECT_DESC
+            STA SPRT_X
+            LDA OBJECT_DESC+1
+            STA SPRT_Y
+            LDA #$04
+            LDY #$10
+            LDX #$40
+            JSR DEL_ZONE
             RTS
 
 DEL_PLAYER  LDA PLAYER_DESC
             STA SPRT_X
             LDA PLAYER_DESC+1
             STA SPRT_Y
-            LDX #$50         
-            LDY #$28         
-            LDA #$02         
+            LDA #$02
+            LDY #$10
+            LDX #$20
             JSR DEL_ZONE
             RTS
 
-RUN         JSR INIT
-            LDA #$00
-            JSR DHGR_CLR
-;            JSR CORNER
+DRAW_OBJECT
+            LDA #01
+            BIT OBJECT_DESC
+            BEQ .1
+            LDA #MONSTER2
+            STA SPRT_LO
+            LDA /MONSTER2
+            STA SPRT_HI
+            JMP .2
+.1          LDA #MONSTER
+            STA SPRT_LO
+            LDA /MONSTER
+            STA SPRT_HI
+.2          LDA OBJECT_DESC
+            STA SPRT_X
+            LDA OBJECT_DESC+1
+            STA SPRT_Y
+            JSR DRW_SPRITE
+            RTS
 
-GAMELOOP    
+DRAW_PLAYER
             LDA #01
             BIT PLAYER_DESC
             BEQ .1
@@ -81,6 +97,27 @@ GAMELOOP
             LDA PLAYER_DESC+1
             STA SPRT_Y
             JSR DRW_SPRITE
+            RTS
+
+MOVE_OBJECT
+            JSR DEL_OBJECT
+            INC OBJECT_DESC
+            LDA #$12
+            CMP OBJECT_DESC
+            BNE .1
+            LDA #00
+            STA OBJECT_DESC
+.1          RTS
+
+RUN         JSR INIT
+            LDA #$00
+            JSR DHGR_CLR
+;            JSR CORNER
+
+GAMELOOP
+            JSR MOVE_OBJECT
+            JSR DRAW_OBJECT
+            JSR DRAW_PLAYER
 
             JSR READKEYB
             CMP #$15
