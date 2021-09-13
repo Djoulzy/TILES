@@ -23,10 +23,13 @@ SCRN_LO		.EQ $1D				;Zero page location for low byte of our screen row
 SCRN_HI		.EQ $1E				;Zero page location for high byte of our screen row
 SPRT_LO		.EQ $FA
 SPRT_HI		.EQ $FB
-SPRT_X		.EQ $FC
-SPRT_Y		.EQ $FD
+SPRT_INF_LO .EQ $FC
+SPRT_INF_HI .EQ $FD
 CPT         .EQ $FE
 VBL			.EQ	$C019
+*--------------------------------------
+SPRT_X      .HS 00
+SPRT_Y      .HS 00
 *--------------------------------------
 MAN
 SAVE /DEV/TILES/SRC/DEF.S

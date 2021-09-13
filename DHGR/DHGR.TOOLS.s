@@ -136,6 +136,15 @@ DHGR2_CLR   PHA
             BNE .24         ;in AUX memory
             RTS
 *--------------------------------------
+; Lecture du clavier non bloquant
+; Retourne le KeyCode dans A
+READKEYB    BIT KBD
+            BPL .1
+            LDA KBD
+            BIT KBDSTRB
+            AND #$7F
+.1          RTS
+*--------------------------------------
 MAN
 SAVE /DEV/TILES/SRC/DHGR.TOOLS.S
 TEXT /DEV/TILES/TXT/DHGR.TOOLS.S

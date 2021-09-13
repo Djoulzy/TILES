@@ -88,6 +88,7 @@ PLAYER
 ; ["blck","blck","mdbl","blck","mdbl","blck","blck"],["blck","blck","mdbl","blck","mdbl","blck","blck"],
 ; ["blck","blck","mdbl","blck","mdbl","blck","blck"],["blck","blck","mdbl","blck","mdbl","blck","blck"]]
 			.HS 02,10,20
+			.DA #PLAYER2,/PLAYER2
 			.HS 00,11
 			.HS 00,13
 			.HS 00,13
@@ -123,6 +124,7 @@ PLAYER
 
 PLAYER2
 			.HS 02,10,20
+			.DA #PLAYER,/PLAYER
 			.HS 00,44
 			.HS 00,4D
 			.HS 00,4D
@@ -158,6 +160,7 @@ PLAYER2
 *--------------------------------------
 MONSTER
 			.HS 04,10,40
+			.DA #MONSTER2,/MONSTER2
 			.HS 00,00,00,00
 			.HS 00,00,01,00
 			.HS 00,40,11,00
@@ -192,6 +195,7 @@ MONSTER
 			.HS 00,00,00,00
 MONSTER2
 			.HS 04,10,40
+			.DA #MONSTER,/MONSTER
 			.HS 00,00,00,00
 			.HS 00,00,04,00
 			.HS 00,00,44,00

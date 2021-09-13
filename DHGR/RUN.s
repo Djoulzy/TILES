@@ -28,96 +28,103 @@ INIT        STA GRAPHON         ;Turn on graphics
             BMI :2
             .EM
 *--------------------------------------
-PLAYER_DESC .HS 00,00           ; Player X,Y
-OBJECT_DESC .HS 00,00
+;  0: Coord X
+; +1: Coord Y
+; +2: Speed X
+; +3: Speed Y
+; +4: Timer Default
+; +5: Timer compter
+; +6: Sprite def LO
+; +7: Sprite def HI
+PLYR_NFO    .HS 00,00,00,00,00,00
+            .DA #PLAYER,/PLAYER
+OBJ1_NFO    .HS 00,00,00,00,FF,FF
+            .DA #MONSTER,/MONSTER
 *--------------------------------------
+MV_SPRITE
+            LDY #$05                ; Lecture du timer
+            LDA (SPRT_INF_LO),Y
+            BEQ .01
+            DEC
+            STA (SPRT_INF_LO),Y
+            BNE END_MV_SPRITE       ; Test si le timer arrive à zero
 
-READKEYB    BIT KBD
-            BPL .1
-            LDA KBD
-            BIT KBDSTRB
-            AND #$7F
-.1          RTS
+.01         LDA #$00                ; On va tester si le sprite doit bouger
+            LDY #$02                ; En regardant si Speed X ou Speed Y
+            ORA (SPRT_INF_LO),Y     ; sont different de 0
+            LDY #$03
+            ORA (SPRT_INF_LO),Y
+            BEQ END_MV_SPRITE       ; Si les deux sont à 0, on sort
 
-DEL_OBJECT  LDA OBJECT_DESC
-            STA SPRT_X
-            LDA OBJECT_DESC+1
-            STA SPRT_Y
-            LDA #$04
-            LDY #$10
-            LDX #$40
+            >GET_COORD
+            >GET_SHAPE
             JSR DEL_ZONE
-            RTS
+            >GET_COORD
 
-DEL_PLAYER  LDA PLAYER_DESC
-            STA SPRT_X
-            LDA PLAYER_DESC+1
-            STA SPRT_Y
-            LDA #$02
-            LDY #$10
-            LDX #$20
-            JSR DEL_ZONE
-            RTS
+            LDY #$04
+            LDA (SPRT_INF_LO),Y
+            LDY #$05
+            STA (SPRT_INF_LO),Y     ; On reinitialise le timer
 
-DRAW_OBJECT
-            LDA #01
-            BIT OBJECT_DESC
-            BEQ .1
-            LDA #MONSTER2
-            STA SPRT_LO
-            LDA /MONSTER2
-            STA SPRT_HI
-            JMP .2
-.1          LDA #MONSTER
-            STA SPRT_LO
-            LDA /MONSTER
-            STA SPRT_HI
-.2          LDA OBJECT_DESC
-            STA SPRT_X
-            LDA OBJECT_DESC+1
-            STA SPRT_Y
-            JSR DRW_SPRITE
-            RTS
+            ; Mouvement sur l'axe des X
+            LDY #$02                ; Lecture de speed X
+            LDA #$8F
+            AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
+            BEQ .03                 ; Si c'est zero : pas de mouvements
+            BPL .05                 ; sinon on branche
+            DEC SPRT_X
+            JMP .03
+.05         INC SPRT_X
 
-DRAW_PLAYER
-            LDA #01
-            BIT PLAYER_DESC
-            BEQ .1
-            LDA #PLAYER2
-            STA SPRT_LO
-            LDA /PLAYER2
-            STA SPRT_HI
-            JMP .2
-.1          LDA #PLAYER
-            STA SPRT_LO
-            LDA /PLAYER
-            STA SPRT_HI
-.2          LDA PLAYER_DESC
-            STA SPRT_X
-            LDA PLAYER_DESC+1
-            STA SPRT_Y
-            JSR DRW_SPRITE
-            RTS
+            ; Mouvement sur l'axe des X
+.03         LDY #$03                ; Lecture de speed X
+            LDA #$8F
+            AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
+            BEQ .07                 ; Si c'est zero : pas de mouvements
+            BPL .06                 ; sinon on branche
+            DEC SPRT_Y
+            JMP .07
+.06         INC SPRT_Y
 
-MOVE_OBJECT
-            JSR DEL_OBJECT
-            INC OBJECT_DESC
-            LDA #$12
-            CMP OBJECT_DESC
-            BNE .1
-            LDA #00
-            STA OBJECT_DESC
-.1          RTS
+.07         >SAVE_COORD
+                                
+            LDA #$00
+            LDY #$02
+            STA (SPRT_INF_LO),Y     ; On reset Speed X
+            LDY #$03
+            STA (SPRT_INF_LO),Y     ; On reset Speed Y
+
+END_MV_SPRITE
+            RTS
 
 RUN         JSR INIT
             LDA #$00
             JSR DHGR_CLR
-;            JSR CORNER
 
 GAMELOOP
-            JSR MOVE_OBJECT
-            JSR DRAW_OBJECT
-            JSR DRAW_PLAYER
+            LDA #OBJ1_NFO
+            STA SPRT_INF_LO
+            LDA /OBJ1_NFO
+            STA SPRT_INF_HI
+            LDA #$81
+            STA OBJ1_NFO+2
+            JSR MV_SPRITE
+            LDA SPRT_X
+            BMI .1
+            CMP #$26
+            BNE .2
+            STZ OBJ1_NFO
+            JMP .2
+.1          LDA #$24
+            STA OBJ1_NFO
+.2          JSR DRAW_SPRITE
+
+            LDA #PLYR_NFO
+            STA SPRT_INF_LO
+            LDA /PLYR_NFO
+            STA SPRT_INF_HI
+            JSR MV_SPRITE
+            JSR DRAW_SPRITE
 
             JSR READKEYB
             CMP #$15
@@ -128,28 +135,19 @@ GAMELOOP
             BEQ PLYR_DOWN
             CMP #$0B
             BEQ PLYR_UP
+
             JMP GAMELOOP
 
-PLYR_RIGHT  JSR DEL_PLAYER
-            INC PLAYER_DESC
+PLYR_RIGHT  INC PLYR_NFO+2
             JMP GAMELOOP
 
-PLYR_LEFT   JSR DEL_PLAYER
-            DEC PLAYER_DESC
+PLYR_LEFT   DEC PLYR_NFO+2
             JMP GAMELOOP
 
-PLYR_DOWN   JSR DEL_PLAYER
-            INC PLAYER_DESC+1
-            INC PLAYER_DESC+1
-            INC PLAYER_DESC+1
-            INC PLAYER_DESC+1
+PLYR_DOWN   INC PLYR_NFO+3
             JMP GAMELOOP
 
-PLYR_UP     JSR DEL_PLAYER
-            DEC PLAYER_DESC+1
-            DEC PLAYER_DESC+1
-            DEC PLAYER_DESC+1
-            DEC PLAYER_DESC+1
+PLYR_UP     DEC PLYR_NFO+3
             JMP GAMELOOP
 
 GAMELOOPEND
