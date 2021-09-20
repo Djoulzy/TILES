@@ -193,11 +193,6 @@ MV_SPRITE   LDA #$00                ; On va tester si le sprite doit bouger
 
            >GET_COORD
 
-            LDY #$04
-            LDA (SPRT_INF_LO),Y
-            LDY #$05
-            STA (SPRT_INF_LO),Y     ; On reinitialise le timer
-
             ; Mouvement sur l'axe des X
             LDY #$02                ; Lecture de speed X
             LDA #$8F
@@ -208,10 +203,10 @@ MV_SPRITE   LDA #$00                ; On va tester si le sprite doit bouger
             JMP .03
 .02         INC SPRT_X
 
-            ; Mouvement sur l'axe des X
-.03         LDY #$03                ; Lecture de speed X
+            ; Mouvement sur l'axe des Y
+.03         LDY #$03                ; Lecture de speed Y
             LDA #$8F
-            AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
+            AND (SPRT_INF_LO),Y     ; On teste si speed Y est negatif
             BEQ .07                 ; Si c'est zero : pas de mouvements
             BPL .06                 ; sinon on branche
             DEC SPRT_Y
