@@ -176,7 +176,7 @@ DRAW_SPRITE
 .1          JSR DRAW_SHAPE
             RTS
 *--------------------------------------
-; Procede au calcul de déplacement du sprite
+; Procede au calcul de déplacement automatique du sprite selon une direction X ou Y
 ;
 ; Input:
 ; #<desc_sprite> -> SPRT_INF_LO
@@ -191,29 +191,37 @@ MV_SPRITE   LDA #$00                ; On va tester si le sprite doit bouger
             ORA (SPRT_INF_LO),Y
             BEQ END_MV_SPRITE       ; Si les deux sont à 0, on sort
 
-           >GET_COORD
-
             ; Mouvement sur l'axe des X
+            LDY #$00                ; Récupération de Coord X
+            LDA (SPRT_INF_LO),Y
+            TAX                     ; On place le res dans X
             LDY #$02                ; Lecture de speed X
             LDA #$8F
             AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
-            BEQ .03                 ; Si c'est zero : pas de mouvements
+            BEQ .04                 ; Si c'est zero : pas de mouvements
             BPL .02                 ; sinon on branche
-            DEC SPRT_X
+            DEX
             JMP .03
-.02         INC SPRT_X
+.02         INX
+.03         TXA
+            LDY #$00
+            STA (SPRT_INF_LO),Y     ; On stocke la nouvelle valeur de CoordX
 
             ; Mouvement sur l'axe des Y
-.03         LDY #$03                ; Lecture de speed Y
+.04         LDY #$01                ; Récupération de Coord Y
+            LDA (SPRT_INF_LO),Y
+            TAX                     ; On place le res dans X
+            LDY #$03                ; Lecture de speed Y
             LDA #$8F
             AND (SPRT_INF_LO),Y     ; On teste si speed Y est negatif
-            BEQ .07                 ; Si c'est zero : pas de mouvements
+            BEQ END_MV_SPRITE       ; Si c'est zero : pas de mouvements
             BPL .06                 ; sinon on branche
-            DEC SPRT_Y
+            DEX
             JMP .07
-.06         INC SPRT_Y
-
-.07         >SAVE_COORD
+.06         INX
+.07         TXA
+            LDY #$01
+            STA (SPRT_INF_LO),Y     ; On stocke la nouvelle valeur de CoordY
 
 END_MV_SPRITE
             RTS

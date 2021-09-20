@@ -99,6 +99,8 @@ GAMELOOP
             LDA /OBJ1_NFO
             STA SPRT_INF_HI
             JSR MV_SPRITE
+
+            >WAITVBL
             JSR DRAW_SPRITE
 
 ;            LDA #OBJ2_NFO
