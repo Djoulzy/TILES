@@ -43,9 +43,9 @@ RUN         JSR INIT
             JSR HR_CLR
 
 GAMELOOP    
-            LDA #LETTER_A
+            LDA #PLAYER
             STA SPRT_LO
-            LDA /LETTER_A
+            LDA /PLAYER
             STA SPRT_HI
             LDA PLAYER_DESC
             STA SPRT_X

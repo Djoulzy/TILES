@@ -10,16 +10,9 @@ AUTO 4,1
 			.INB /DEV/TILES/SRC/DEF.S
 			.INB /DEV/TILES/SRC/GFXTABLES.S
 			.INB /DEV/TILES/SRC/DHGR.TOOLS.S
+			.INB /DEV/TILES/SRC/RND.S
 			.INB /DEV/TILES/SRC/DHGR.SPRITE.S
-            .INB /DEV/TILES/SRC/DIV7.S
-*--------------------------------------
-INIT        STA GRAPHON         ;Turn on graphics
-            STA HIRESON         ;Turn on hi-res 
-            STA FULLON          ;Turn on fullscreen
-            LDA AN3             ;Turn on DHR
-            STA ON80COL         ;Turn on 80 columns
-            STA ON80STOR        ;Use PAGE1/PAGE2 to switch between MAIN and AUX
-            RTS
+            .INB /DEV/TILES/SRC/PLAYER.S
 *--------------------------------------
 			.MA WAITVBL
 :1			BIT VBL
@@ -36,118 +29,97 @@ INIT        STA GRAPHON         ;Turn on graphics
 ; +5: Timer compter
 ; +6: Sprite def LO
 ; +7: Sprite def HI
-PLYR_NFO    .HS 00,00,00,00,00,00
+PLYR_NFO    .HS 00,0C,00,00,00,00
             .DA #PLAYER,/PLAYER
-OBJ1_NFO    .HS 00,00,00,00,FF,FF
+OBJ1_NFO    .HS 24,06,00,01,00,00
+            .DA #MONSTER,/MONSTER
+OBJ2_NFO    .HS 20,06,00,81,00,00
+            .DA #MONSTER,/MONSTER
+OBJ3_NFO    .HS 1C,06,00,01,00,00
+            .DA #MONSTER,/MONSTER
+OBJ4_NFO    .HS 18,06,00,81,00,00
             .DA #MONSTER,/MONSTER
 *--------------------------------------
-MV_SPRITE
-            LDY #$05                ; Lecture du timer
-            LDA (SPRT_INF_LO),Y
-            BEQ .01
-            DEC
-            STA (SPRT_INF_LO),Y
-            BNE END_MV_SPRITE       ; Test si le timer arrive à zero
-
-.01         LDA #$00                ; On va tester si le sprite doit bouger
-            LDY #$02                ; En regardant si Speed X ou Speed Y
-            ORA (SPRT_INF_LO),Y     ; sont different de 0
-            LDY #$03
-            ORA (SPRT_INF_LO),Y
-            BEQ END_MV_SPRITE       ; Si les deux sont à 0, on sort
-
-            >GET_COORD
-            >GET_SHAPE
-            JSR DEL_ZONE
-            >GET_COORD
-
-            LDY #$04
-            LDA (SPRT_INF_LO),Y
-            LDY #$05
-            STA (SPRT_INF_LO),Y     ; On reinitialise le timer
-
-            ; Mouvement sur l'axe des X
-            LDY #$02                ; Lecture de speed X
+MV_MONSTER
+            LDY #$03                ; Lecture de speed Y
             LDA #$8F
             AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
-            BEQ .03                 ; Si c'est zero : pas de mouvements
-            BPL .05                 ; sinon on branche
-            DEC SPRT_X
-            JMP .03
-.05         INC SPRT_X
-
-            ; Mouvement sur l'axe des X
-.03         LDY #$03                ; Lecture de speed X
-            LDA #$8F
-            AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
-            BEQ .07                 ; Si c'est zero : pas de mouvements
+            BEQ .04                 ; Si c'est zero : pas de mouvements
             BPL .06                 ; sinon on branche
-            DEC SPRT_Y
-            JMP .07
-.06         INC SPRT_Y
 
-.07         >SAVE_COORD
-                                
-            LDA #$00
-            LDY #$02
-            STA (SPRT_INF_LO),Y     ; On reset Speed X
-            LDY #$03
-            STA (SPRT_INF_LO),Y     ; On reset Speed Y
+            ; Decrementation de Y
+            LDY #$01
+            LDA (SPRT_INF_LO),Y     ; On charge Coord Y
+            DEC
+            TAX
+            BNE .3                  ; On teste si on atteint le haut de l'écran
+            LDA #$01                ; Oui, on passe Speed Y en positif
+            JMP .2
 
-END_MV_SPRITE
+            ; Incrementation de Y
+.06         LDY #$01
+            LDA (SPRT_INF_LO),Y     ; On charge Coord Y        
+            INC
+            TAX
+            CMP #$B0                ; On teste si on atteint le bas de l'ecran
+            BNE .3                  ; non, on sort 
+            LDA #$81                ; Valeur negative pour Speed Y
+
+.2          LDY #$03          
+            STA (SPRT_INF_LO),Y     ; Sauvegarde de la nouvelle vitesse
+.3          LDY #$01
+            TXA
+            STA (SPRT_INF_LO),Y     ; Sauvegarde de Coord Y
+.4          JSR DRAW_SPRITE
             RTS
 
 RUN         JSR INIT
+            JSR RESEED
             LDA #$00
             JSR DHGR_CLR
+
+;            LDA #$B0
+;            STA MODULO
+;            JSR RANDOM
+;            STA OBJ1_NFO+1
+;
+;            LDA #$B0
+;            STA MODULO
+;            JSR RANDOM
+;            STA OBJ2_NFO+1
+;
+;            LDA #$B0
+;            STA MODULO
+;            JSR RANDOM
+;            STA OBJ3_NFO+1
 
 GAMELOOP
             LDA #OBJ1_NFO
             STA SPRT_INF_LO
             LDA /OBJ1_NFO
             STA SPRT_INF_HI
-            LDA #$81
-            STA OBJ1_NFO+2
             JSR MV_SPRITE
-            LDA SPRT_X
-            BMI .1
-            CMP #$26
-            BNE .2
-            STZ OBJ1_NFO
-            JMP .2
-.1          LDA #$24
-            STA OBJ1_NFO
-.2          JSR DRAW_SPRITE
 
-            LDA #PLYR_NFO
-            STA SPRT_INF_LO
-            LDA /PLYR_NFO
-            STA SPRT_INF_HI
-            JSR MV_SPRITE
-            JSR DRAW_SPRITE
+;            LDA #OBJ2_NFO
+;            STA SPRT_INF_LO
+;            LDA /OBJ2_NFO
+;            STA SPRT_INF_HI
+;            JSR MV_MONSTER
+;
+;            LDA #OBJ3_NFO
+;            STA SPRT_INF_LO
+;            LDA /OBJ3_NFO
+;            STA SPRT_INF_HI
+;            JSR MV_MONSTER
+;
+;            LDA #OBJ4_NFO
+;            STA SPRT_INF_LO
+;            LDA /OBJ4_NFO
+;            STA SPRT_INF_HI
+;            JSR MV_MONSTER
 
-            JSR READKEYB
-            CMP #$15
-            BEQ PLYR_RIGHT
-            CMP #$08
-            BEQ PLYR_LEFT
-            CMP #$0A
-            BEQ PLYR_DOWN
-            CMP #$0B
-            BEQ PLYR_UP
+            JSR MV_PLAYER
 
-            JMP GAMELOOP
-
-PLYR_RIGHT  INC PLYR_NFO+2
-            JMP GAMELOOP
-
-PLYR_LEFT   DEC PLYR_NFO+2
-            JMP GAMELOOP
-
-PLYR_DOWN   INC PLYR_NFO+3
-            JMP GAMELOOP
-
-PLYR_UP     DEC PLYR_NFO+3
             JMP GAMELOOP
 
 GAMELOOPEND

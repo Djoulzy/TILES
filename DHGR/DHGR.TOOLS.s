@@ -6,6 +6,14 @@ NEW
 *			.OR	$800
 *			.TF /DEV/TILES/OBJ/DHGR.TOOLS
 *--------------------------------------
+INIT        STA GRAPHON         ;Turn on graphics
+            STA HIRESON         ;Turn on hi-res 
+            STA FULLON          ;Turn on fullscreen
+            LDA AN3             ;Turn on DHR
+            STA ON80COL         ;Turn on 80 columns
+            STA ON80STOR        ;Use PAGE1/PAGE2 to switch between MAIN and AUX
+            RTS
+*--------------------------------------
 DHGR_CLR    STA PAGE1       ;Select MAIN memory
             LDY #$02        ;Counter for MAIN/AUX
 .21         LDX #$00        ;Start at byte 0
@@ -135,15 +143,6 @@ DHGR2_CLR   PHA
             STA WRT_MAIN    ;Now do it all over again
             BNE .24         ;in AUX memory
             RTS
-*--------------------------------------
-; Lecture du clavier non bloquant
-; Retourne le KeyCode dans A
-READKEYB    BIT KBD
-            BPL .1
-            LDA KBD
-            BIT KBDSTRB
-            AND #$7F
-.1          RTS
 *--------------------------------------
 MAN
 SAVE /DEV/TILES/SRC/DHGR.TOOLS.S

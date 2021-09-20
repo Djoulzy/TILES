@@ -67,6 +67,41 @@ LETTER_A
 			.DA #%00111100
 			.DA #%00000000
 *--------------------------------------
+; [["blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck"],
+; ["blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck"],
+; ["col2","col2","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck"],
+; ["whte","whte","col2","col2","col2","col2","col2","blck","blck","blck","blck","blck","blck","blck"],
+; ["blck","whte","whte","whte","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck"],
+; ["blck","whte","whte","whte","whte","blck","blck","whte","whte","whte","blck","col1","blck","blck"],
+; ["col2","blck","whte","whte","whte","whte","whte","whte","col1","col1","whte","whte","blck","blck"],
+; ["col2","col2","whte","whte","whte","whte","whte","whte","whte","col1","col1","col2","col1","blck"],
+; ["col2","col2","whte","whte","whte","whte","whte","whte","whte","col1","col1","col2","col1","blck"],
+; ["col2","blck","whte","whte","whte","whte","whte","whte","col1","col1","whte","whte","blck","blck"],
+; ["blck","whte","whte","whte","whte","blck","blck","whte","whte","whte","blck","col1","blck","blck"],
+; ["blck","whte","whte","whte","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck"],
+; ["whte","whte","col2","col2","col2","col2","col2","blck","blck","blck","blck","blck","blck","blck"],
+; ["col2","col2","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck"],
+; ["blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck"],
+; ["blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck","blck"]]
+PLAYER
+			.HS 04,10,40
+			.HS 00,00,00,00
+			.HS 00,00,00,00
+			.HS 0A,00,00,00
+			.HS 2F,55,00,00
+			.HS 7C,01,00,00
+			.HS 7C,07,3F,02
+			.HS F2,7F,D7,07
+			.HS FA,7F,DF,0C
+			.HS FA,7F,DF,0C
+			.HS F2,7F,D7,07
+			.HS 7C,07,3F,02
+			.HS 7C,01,00,00
+			.HS 2F,55,00,00
+			.HS 0A,00,00,00
+			.HS 00,00,00,00
+			.HS 00,00,00,00
+*--------------------------------------
 MAN
 SAVE /DEV/TILES.HR/SRC/GFXTABLES.S
 TEXT /DEV/TILES.HR/TXT/GFXTABLES.S

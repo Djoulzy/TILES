@@ -9,10 +9,10 @@ NEW
             .MA GET_SHAPE
             LDY #$06                ; Récupération du shape (pos 6 et 7)
             LDA (SPRT_INF_LO),Y
-            STA SPRT_LO
+            STA SHAPE_LO
             INY
             LDA (SPRT_INF_LO),Y
-            STA SPRT_HI
+            STA SHAPE_HI
             .EM
 *--------------------------------------
             .MA GET_COORD
@@ -33,23 +33,23 @@ NEW
             STA (SPRT_INF_LO),Y     ; On stocke la nouvelle valeur de Coord X
             .EM
 *--------------------------------------
-; Coord zone -> SPRT_X, SPRT_Y
-; Shape -> SPRT_LO,SPRT_HI
-
-; Nb total de bytes -> X
-; Nb lignes -> Y
-; Nb bytes par ligne -> A
+; Input:
+; Coord zone    -> SPRT_X, SPRT_Y
+; Shape address -> SHAPE_LO,SHAPE_HI
+; 
+; Output:
+; void
 DEL_ZONE
             LDY #$00            ; Lecture de nb de byte par ligne
-            LDA (SPRT_LO),Y
+            LDA (SHAPE_LO),Y
 			STA .02+1
 
             LDY #$02            ; Lecture de nb total de bytes
-            LDA (SPRT_LO),Y
+            LDA (SHAPE_LO),Y
             TAX
 
             LDY #$01
-            LDA (SPRT_LO),Y     ; Lecture de nb total de lignes
+            LDA (SHAPE_LO),Y     ; Lecture de nb total de lignes
 
             CLC
             ADC SPRT_Y
@@ -83,33 +83,37 @@ DEL_ZONE
 END_DEL_ZONE
             RTS
 *--------------------------------------
-; Coord sprite -> SPRT_X, SPRT_Y
-; Data du sprite dans SPRT_LO, SPRT_HI
+; Dessine une image en mode DHGR
+;
+; Input:
+; Coord zone    -> SPRT_X, SPRT_Y
+; Shape address -> SHAPE_LO,SHAPE_HI
 ; 
-; Les 3 premier byte du sprite sont :
-; nb bytes sur 1 ligne / nb lignes / nb total de bytes
+; Output:
+; void
 DRAW_SHAPE
+            >GET_COORD
             LDA #$05            ; On va réécrire le code en AA avec l'adresse du sprite
             CLC                 ; à laquelle on ajoute le nb de byte par ligne
-            ADC SPRT_LO         ; On evite de lire directement l'adresse du sprite pour    
+            ADC SHAPE_LO        ; On evite de lire directement l'adresse du sprite pour    
             STA .03+1           ; ne pas manipuler inutilement la pile
             LDA #$00            ; On additionne 3 pour sauté les byte qui definissent sa taille
-            ADC SPRT_HI
+            ADC SHAPE_HI
             STA .03+2           ; L'adresse AA devient : LDA SPRITE+3,X
 
             LDY #$02
-            LDA (SPRT_LO),Y     ; Meme chose pour les données du sprite pour la zone MAIN
+            LDA (SHAPE_LO),Y    ; Meme chose pour les données du sprite pour la zone MAIN
             TAX                 ; Compteur du nombre de bytes composant le sprite
             CLC                 ; Du coup on lui additionne le nb total de byte de la zone AUX
             ADC #$05            ; + le poid de l'entete
-            ADC SPRT_LO         ; pour trouver le debut des data
+            ADC SHAPE_LO        ; pour trouver le debut des data
             STA .05+1
             LDA #$00
-            ADC SPRT_HI
+            ADC SHAPE_HI
             STA .05+2           ; L'adresse BB devient : LDA SPRITE+nb+3,X
 
             LDY #$01            ; On recupère le nb de ligne du sprite
-            LDA (SPRT_LO),Y     ; On ajoute le nombre de ligne du sprite à la pos Y de départ
+            LDA (SHAPE_LO),Y    ; On ajoute le nombre de ligne du sprite à la pos Y de départ
             CLC
             ADC SPRT_Y
             STA SPRT_Y
@@ -126,7 +130,7 @@ DRAW_SHAPE
             STA .06+1           ; l'adresse du début de ligne 
 
             LDY #$00            ; Mise en place du compteur de byte par ligne
-            LDA (SPRT_LO),Y 
+            LDA (SHAPE_LO),Y 
             TAY                 ; Y sert de compteur
             DEY
 
@@ -145,28 +149,78 @@ DRAW_SHAPE
 END_DRAW_SHAPE
             RTS
 *--------------------------------------
-; Adresse de la structure descriptive du sprite
-; dans SPRT_INF :
+; Selectionne le shape en rapport avec la memoire MAIN ou AUX
+;
+; Input:
 ; #<desc_sprite> -> SPRT_INF_LO
 ; /<desc_sprite> -> SPRT_INF_HI
+; 
+; Output:
+; void
 DRAW_SPRITE
             >GET_SHAPE
- 
-            >GET_COORD
 
-            LDA #01
-            BIT SPRT_X
+            LDY #$00
+            LDA (SPRT_INF_LO),Y
+            AND #$01
             BEQ .1
 
             LDY #$03
-            LDA (SPRT_LO),Y
+            LDA (SHAPE_LO),Y
             TAX
             LDY #$04
-            LDA (SPRT_LO),Y
-            STA SPRT_HI
-            STX SPRT_LO
+            LDA (SHAPE_LO),Y
+            STA SHAPE_HI
+            STX SHAPE_LO
 
 .1          JSR DRAW_SHAPE
+            RTS
+*--------------------------------------
+; Procede au calcul de déplacement du sprite
+;
+; Input:
+; #<desc_sprite> -> SPRT_INF_LO
+; /<desc_sprite> -> SPRT_INF_HI
+; 
+; Output:
+; void
+MV_SPRITE   LDA #$00                ; On va tester si le sprite doit bouger
+            LDY #$02                ; En regardant si Speed X ou Speed Y
+            ORA (SPRT_INF_LO),Y     ; sont different de 0
+            LDY #$03
+            ORA (SPRT_INF_LO),Y
+            BEQ END_MV_SPRITE       ; Si les deux sont à 0, on sort
+
+           >GET_COORD
+
+            LDY #$04
+            LDA (SPRT_INF_LO),Y
+            LDY #$05
+            STA (SPRT_INF_LO),Y     ; On reinitialise le timer
+
+            ; Mouvement sur l'axe des X
+            LDY #$02                ; Lecture de speed X
+            LDA #$8F
+            AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
+            BEQ .03                 ; Si c'est zero : pas de mouvements
+            BPL .02                 ; sinon on branche
+            DEC SPRT_X
+            JMP .03
+.02         INC SPRT_X
+
+            ; Mouvement sur l'axe des X
+.03         LDY #$03                ; Lecture de speed X
+            LDA #$8F
+            AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
+            BEQ .07                 ; Si c'est zero : pas de mouvements
+            BPL .06                 ; sinon on branche
+            DEC SPRT_Y
+            JMP .07
+.06         INC SPRT_Y
+
+.07         >SAVE_COORD
+
+END_MV_SPRITE
             RTS
 *--------------------------------------
 MAN

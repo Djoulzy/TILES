@@ -21,8 +21,8 @@ WRT_MAIN	.EQ $C004			;RAMWRTOFF
 WRT_AUX		.EQ $C005			;RAMWRTON
 SCRN_LO		.EQ $1D				;Zero page location for low byte of our screen row
 SCRN_HI		.EQ $1E				;Zero page location for high byte of our screen row
-SPRT_LO		.EQ $FA
-SPRT_HI		.EQ $FB
+SHAPE_LO    .EQ $FA
+SHAPE_HI    .EQ $FB
 SPRT_INF_LO .EQ $FC
 SPRT_INF_HI .EQ $FD
 CPT         .EQ $FE
