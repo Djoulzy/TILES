@@ -39,6 +39,20 @@ OBJ3_NFO    .HS 1C,06,00,01,00,00
             .DA #MONSTER,/MONSTER
 OBJ4_NFO    .HS 18,06,00,81,00,00
             .DA #MONSTER,/MONSTER
+
+STAR1_NFO   .HS 24,06,81,00,00,00
+            .DA #STAR,/STAR
+STAR2_NFO   .HS 18,24,81,00,00,00
+            .DA #STAR,/STAR
+STAR3_NFO   .HS 24,06,81,00,00,00
+            .DA #STAR,/STAR
+STAR4_NFO   .HS 20,18,81,00,00,00
+            .DA #STAR,/STAR
+
+PLANET_NFO  .HS 22,00,01,01,00,00
+            .DA #PLANET,/PLANET
+PLANET2_NFO .HS 22,10,01,01,00,00
+            .DA #PLANET2,/PLANET2
 *--------------------------------------
 MV_MONSTER
             LDY #$03                ; Lecture de speed Y
@@ -94,32 +108,67 @@ RUN         JSR INIT
 ;            STA OBJ3_NFO+1
 
 GAMELOOP
+            LDA #PLANET_NFO
+            STA SPRT_INF_LO
+            LDA /PLANET_NFO
+            STA SPRT_INF_HI
+            JSR DRAW_SPRITE
+            LDA #PLANET2_NFO
+            STA SPRT_INF_LO
+            LDA /PLANET2_NFO
+            STA SPRT_INF_HI
+            JSR DRAW_SPRITE
+
+            LDA #STAR1_NFO
+            STA SPRT_INF_LO
+            LDA /STAR1_NFO
+            STA SPRT_INF_HI
+            JSR MV_SPRITE
+            JSR DRAW_SPRITE
+
+            LDA #STAR2_NFO
+            STA SPRT_INF_LO
+            LDA /STAR2_NFO
+            STA SPRT_INF_HI
+            JSR MV_SPRITE
+            JSR DRAW_SPRITE
+
+            LDA #STAR3_NFO
+            STA SPRT_INF_LO
+            LDA /STAR3_NFO
+            STA SPRT_INF_HI
+            JSR MV_SPRITE
+            JSR DRAW_SPRITE
+
+            LDA #STAR4_NFO
+            STA SPRT_INF_LO
+            LDA /STAR4_NFO
+            STA SPRT_INF_HI
+            JSR MV_SPRITE
+            JSR DRAW_SPRITE
             LDA #OBJ1_NFO
             STA SPRT_INF_LO
             LDA /OBJ1_NFO
             STA SPRT_INF_HI
-            JSR MV_SPRITE
+            JSR MV_MONSTER
 
-            >WAITVBL
-            JSR DRAW_SPRITE
+            LDA #OBJ2_NFO
+            STA SPRT_INF_LO
+            LDA /OBJ2_NFO
+            STA SPRT_INF_HI
+            JSR MV_MONSTER
 
-;            LDA #OBJ2_NFO
-;            STA SPRT_INF_LO
-;            LDA /OBJ2_NFO
-;            STA SPRT_INF_HI
-;            JSR MV_MONSTER
-;
-;            LDA #OBJ3_NFO
-;            STA SPRT_INF_LO
-;            LDA /OBJ3_NFO
-;            STA SPRT_INF_HI
-;            JSR MV_MONSTER
-;
-;            LDA #OBJ4_NFO
-;            STA SPRT_INF_LO
-;            LDA /OBJ4_NFO
-;            STA SPRT_INF_HI
-;            JSR MV_MONSTER
+            LDA #OBJ3_NFO
+            STA SPRT_INF_LO
+            LDA /OBJ3_NFO
+            STA SPRT_INF_HI
+            JSR MV_MONSTER
+
+            LDA #OBJ4_NFO
+            STA SPRT_INF_LO
+            LDA /OBJ4_NFO
+            STA SPRT_INF_HI
+            JSR MV_MONSTER
 
             JSR MV_PLAYER
 
