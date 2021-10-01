@@ -131,3 +131,12 @@ div.inline { float:left; }
 .aqua {
     background-color: #72E7CB
 }
+
+.pixel {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}

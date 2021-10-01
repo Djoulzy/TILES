@@ -18,15 +18,15 @@ class Pack {
 
         this.stack = new Array(this.pixelsInPack).fill(defaultValue)
         this.palette = new Array(this.bitsPerPixel).fill(0)
+        this.element = new Array(this.bitsPerPixel)
     }
 
     getPaletteIndex(pos) {
         let paletIndex = Math.floor((this.nbBytes / this.pixelsInPack) * pos)
-        console.log(paletIndex)
         return paletIndex
     }
 
-    add(pos, val, pal) {
+    setColor(pos, val, pal) {
         this.stack[pos] = val
         if (isset(pal)) {
             if (pos == 3) {
@@ -62,10 +62,17 @@ class Pack {
         return res
     }
 
-    render() {
+    render(parent) {
         var tmp = ''
+
+        if (!isset(parent)) parent = document.body
         for(var i=0; i<this.pixelsInPack; i++) {
-            tmp += '<div class="pixel" data-pos="'+ i +'">'+ this.stack[i] +'</div>'
+            // tmp += '<div class="pixel" data-pack="'+this+'" data-pos="'+ i +'">'+ this.stack[i] +'</div>'
+            this.element[i] = document.createElement('div');
+            this.element[i].className = "pixel"
+            this.element[i].pack = this
+            this.element[i].innerHTML = this.stack[i]
+            parent.appendChild(this.element[i]);
         }
         return tmp;
     }
@@ -73,40 +80,55 @@ class Pack {
 
 class Sprite {
     constructor(type, width, height) {
-        let nbPackPerLine = Math.round(width / NB_PIXELS_BY_PACK)
-        let totalPacks = nbPackPerLine * height
+        this.nbPackPerLine = Math.round(width / NB_PIXELS_BY_PACK)
+        this.totalPacks = this.nbPackPerLine * height
         switch(type) {
             case 'mono': break
             case 'hgr':
-                this.grid = new Array(totalPacks).fill(new Pack(2))
+                this.grid = new Array(this.totalPacks).fill(new Pack(2))
                 break
             case 'dhgr':
-                this.grid = new Array(totalPacks).fill(new Pack(4))
+                this.grid = new Array(this.totalPacks).fill(new Pack(4))
                 break
         }
     }
 
-    display() {
-        console.log(this.grid)
+    get() {
+        var tmp = "";
         this.grid.forEach(function(value) {
-            document.write(value.get())
+            tmp += value.get()
         })
+        return tmp
     }
 
-    renderGrid() {
-
+    render() {
+        var parent = this;
+        this.grid.forEach(function(value, index) {
+            value.render()
+            if (index % parent.nbPackPerLine == 0) {
+                var elemt = document.createElement('br');
+                document.body.appendChild(elemt);
+            }
+        })
     }
 }
 
+$(document).ready(function() {
+    $(".pixel").on("click", function() {
+        let packObject = $(this)[0].pack
+        console.log(packObject.get())
+    })
+})
+
 let obj1 = new Pack(2);
 
-obj1.add(0, "AA", 0)
-obj1.add(1, "BB", 0)
-obj1.add(2, "CC", 0)
-obj1.add(4, "EE", 0)
-obj1.add(5, "FF", 0)
-obj1.add(6, "GG", 0)
-obj1.add(3, "12", 1)
+obj1.setColor(0, "AA", 0)
+obj1.setColor(1, "BB", 0)
+obj1.setColor(2, "CC", 0)
+obj1.setColor(4, "EE", 0)
+obj1.setColor(5, "FF", 0)
+obj1.setColor(6, "GG", 0)
+obj1.setColor(3, "12", 1)
 
 document.write(obj1.get())
 document.write(obj1.render())
@@ -114,16 +136,18 @@ document.write("<br/><br/>")
 
 let obj2 = new Pack(4);
 
-obj2.add(0, "AAAA")
-obj2.add(1, "BBBB")
-obj2.add(2, "CCCC")
-obj2.add(3, "1234")
-obj2.add(4, "EEEE")
-obj2.add(5, "FFFF")
-obj2.add(6, "GGGG")
+obj2.setColor(0, "AAAA")
+obj2.setColor(1, "BBBB")
+obj2.setColor(2, "CCCC")
+obj2.setColor(3, "1234")
+obj2.setColor(4, "EEEE")
+obj2.setColor(5, "FFFF")
+obj2.setColor(6, "GGGG")
 
 document.write(obj2.get())
 document.write("<br/><br/>")
 
 let sprite1 = new Sprite("hgr", 7, 8)
-sprite1.display()
+sprite1.render()
+document.write("<br/><br/>")
+document.write(sprite1.get())
