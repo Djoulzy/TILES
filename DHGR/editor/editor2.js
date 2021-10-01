@@ -8,7 +8,8 @@ function isset(variable) {
     return false
 }
 
-class Pack {
+class Pack
+{
     constructor(bitsPerPixel) {
         this.pixelsInPack = NB_PIXELS_BY_PACK
         this.bitsPerPixel = bitsPerPixel
@@ -16,9 +17,9 @@ class Pack {
 
         let defaultValue = "0".repeat(bitsPerPixel)
 
-        this.stack = new Array(this.pixelsInPack).fill(defaultValue)
+        this.stack = new Array(this.pixelsInPack).fill(colors[0])
         this.palette = new Array(this.bitsPerPixel).fill(0)
-        this.element = new Array(this.bitsPerPixel)
+        this.element = new Array(this.pixelsInPack)
     }
 
     getPaletteIndex(pos) {
@@ -26,16 +27,29 @@ class Pack {
         return paletIndex
     }
 
+    updatePack() {
+        var parent = this;
+        this.stack.forEach(function(value, index) {
+            let bitsPerPixel = parent.bitsPerPixel.toString()
+            let paletteValue = parent.palette[parent.getPaletteIndex(index)].toString()
+            let colorValue = parent.stack[index][bitsPerPixel][paletteValue]
+            parent.element[index].className = "pixel "+ colorValue.class
+            parent.element[index].innerHTML = colorValue.bin +"<br/>"+ index+ "<br/>"+ paletteValue
+        })
+    }
+
     setColor(pos, val, pal) {
+        console.log(val)
         this.stack[pos] = val
+        let paletIndex = this.getPaletteIndex(pos)
         if (isset(pal)) {
             if (pos == 3) {
                 this.palette[0] = this.palette[1] = pal
             } else {
-                let paletIndex = this.getPaletteIndex(pos)
                 this.palette[paletIndex] = pal
             }
         }
+        this.updatePack()
     }
 
     get() {
@@ -63,32 +77,30 @@ class Pack {
     }
 
     render(parent) {
-        var tmp = ''
-
         if (!isset(parent)) parent = document.body
         for(var i=0; i<this.pixelsInPack; i++) {
-            // tmp += '<div class="pixel" data-pack="'+this+'" data-pos="'+ i +'">'+ this.stack[i] +'</div>'
             this.element[i] = document.createElement('div');
-            this.element[i].className = "pixel"
             this.element[i].pack = this
-            this.element[i].innerHTML = this.stack[i]
+            this.element[i].posInPack = i
             parent.appendChild(this.element[i]);
         }
-        return tmp;
+        this.updatePack()
     }
 }
 
-class Sprite {
+class Sprite
+{
     constructor(type, width, height) {
         this.nbPackPerLine = Math.round(width / NB_PIXELS_BY_PACK)
         this.totalPacks = this.nbPackPerLine * height
+        this.grid = new Array(this.totalPacks)
         switch(type) {
             case 'mono': break
             case 'hgr':
-                this.grid = new Array(this.totalPacks).fill(new Pack(2))
+                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(2)
                 break
             case 'dhgr':
-                this.grid = new Array(this.totalPacks).fill(new Pack(4))
+                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(4)
                 break
         }
     }
@@ -114,40 +126,40 @@ class Sprite {
 }
 
 $(document).ready(function() {
+    let sprite1 = new Sprite("hgr", 7, 8)
+    sprite1.render()
+
     $(".pixel").on("click", function() {
         let packObject = $(this)[0].pack
-        console.log(packObject.get())
+        let pos = $(this)[0].posInPack
+        packObject.setColor(pos, colors['9'], 0)
     })
 })
 
-let obj1 = new Pack(2);
+// let obj1 = new Pack(2);
 
-obj1.setColor(0, "AA", 0)
-obj1.setColor(1, "BB", 0)
-obj1.setColor(2, "CC", 0)
-obj1.setColor(4, "EE", 0)
-obj1.setColor(5, "FF", 0)
-obj1.setColor(6, "GG", 0)
-obj1.setColor(3, "12", 1)
+// obj1.setColor(0, "AA", 0)
+// obj1.setColor(1, "BB", 0)
+// obj1.setColor(2, "CC", 0)
+// obj1.setColor(4, "EE", 0)
+// obj1.setColor(5, "FF", 0)
+// obj1.setColor(6, "GG", 0)
+// obj1.setColor(3, "12", 1)
 
-document.write(obj1.get())
-document.write(obj1.render())
-document.write("<br/><br/>")
+// document.write(obj1.get())
+// document.write(obj1.render())
+// document.write("<br/><br/>")
 
-let obj2 = new Pack(4);
+// let obj2 = new Pack(4);
 
-obj2.setColor(0, "AAAA")
-obj2.setColor(1, "BBBB")
-obj2.setColor(2, "CCCC")
-obj2.setColor(3, "1234")
-obj2.setColor(4, "EEEE")
-obj2.setColor(5, "FFFF")
-obj2.setColor(6, "GGGG")
+// obj2.setColor(0, "AAAA")
+// obj2.setColor(1, "BBBB")
+// obj2.setColor(2, "CCCC")
+// obj2.setColor(3, "1234")
+// obj2.setColor(4, "EEEE")
+// obj2.setColor(5, "FFFF")
+// obj2.setColor(6, "GGGG")
 
-document.write(obj2.get())
-document.write("<br/><br/>")
+// document.write(obj2.get())
+// document.write("<br/><br/>")
 
-let sprite1 = new Sprite("hgr", 7, 8)
-sprite1.render()
-document.write("<br/><br/>")
-document.write(sprite1.get())

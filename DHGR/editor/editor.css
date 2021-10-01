@@ -70,6 +70,7 @@ div.inline { float:left; }
 
 .blck {
     background-color: black;
+    color: white;
 }
 
 .whte {
@@ -108,7 +109,7 @@ div.inline { float:left; }
     background-color: #2134D1
 }
 
-.vilt {
+.mgta {
     background-color: #C735FE
 }
 
@@ -134,9 +135,10 @@ div.inline { float:left; }
 
 .pixel {
     display: inline-block;
-    width: 30px;
-    height: 30px;
-    border-width:1px; 
+    width: 70px;
+    height: 70px;
+    border-width:1px;
+    margin: 1px;
     border-style:solid; 
     border-color:black;
 }
