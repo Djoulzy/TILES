@@ -2,11 +2,31 @@ body {
     font-family:'Courier New', Courier, monospace;
 }
 
-div.inline { float:left; }
+.inline {
+    display: inline-block;
+    vertical-align: top;
+}
+
 .clearBoth { clear:both; }
 
-.drawzone {
+#drawzone {
+    display: inline-block;
     border-width:1px; 
+    border-style:solid; 
+    border-color:black;
+}
+
+#palette {
+    display: inline-block;
+    border-width:1px;
+    border-style:solid; 
+    border-color:black;
+}
+
+#menu {
+    display: inline-block;
+    vertical-align: top;
+    border-width:1px;
     border-style:solid; 
     border-color:black;
 }
@@ -30,13 +50,10 @@ div.inline { float:left; }
     height: 4px;
 }
 
-.palette {
-    width: 100px;
-    height: 400px;
-}
-
 .paletteCell {
-    border-width:1px; 
+    width: 60px;
+    height: 30px;
+    border-width:3px; 
     border-style:solid; 
     border-color:black;
 }
@@ -60,7 +77,7 @@ div.inline { float:left; }
 .output {
     font-family:'Courier New', Courier, monospace;
     width: 500px;
-    height: 350px;
+    height: 800px;
     border-width:1px; 
     border-style:solid; 
     border-color:black;
@@ -77,60 +94,60 @@ div.inline { float:left; }
     background-color: white;
 }
 
-.mgnt {
-    background-color: #970A74
+.red {
+    background-color: #99035F
 }
 
 .brwn {
-    background-color: #756B36
+    background-color: #4F5101
 }
 
-.orge {
-    background-color: #F85815
+.orng {
+    background-color: #F05C00
 }
 
-.dkgr {
-    background-color: #007108
+.dgrn {
+    background-color: #007310
 }
 
 .gry1 {
-    background-color: #787A7A
+    background-color: #7F7F7F
 }
 
 .gren {
-    background-color: #44CA00
+    background-color: #12CA07
 }
 
 .ylow {
-    background-color: #DACB1B
+    background-color: #CED413
 }
 
-.dkbl {
-    background-color: #2134D1
+.dblu {
+    background-color: #4204E1
 }
 
-.mgta {
-    background-color: #C735FE
+.prpl {
+    background-color: #CA13FE
 }
 
 .gry2 {
-    background-color: #797274
+    background-color: #BEBEBE
 }
 
 .pink {
-    background-color: #FE8DDC
+    background-color: #FF85E1
 }
 
-.mdbl {
-    background-color: #03B6EE
+.mblu {
+    background-color: #2497FF
 }
 
-.ltbl {
-    background-color: #ADDEFF
+.lblu {
+    background-color: #AAA2FF
 }
 
 .aqua {
-    background-color: #72E7CB
+    background-color: #51F595
 }
 
 .pixel {

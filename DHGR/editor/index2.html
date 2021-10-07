@@ -11,8 +11,19 @@
         <script src="editor2.js"></script>
     </head>
     <body>
-        <script>
-
-        </script>
+        <div id="drawzone"></div>
+        <div id="palette"></div>
+        <div class="inline">
+            <div class="title">Output</div>
+            <div id="output" class="output"></div>
+        </div>
+        <div id="menu">
+            <input name="format" type="radio" value="bin" />Binary
+            <input name="format" type="radio" value="hexa" checked />Hexa
+            <br/>
+            <input id="compute" type="button" value="Compute" /><br/>
+            <input id="save" type="button" value="Save" />
+            <input id="load" type="button" value="Load" />
+        </div>
     </body>
 </html>
