@@ -18,12 +18,19 @@
             <div id="output" class="output"></div>
         </div>
         <div id="menu">
+            <label for="name">Sprite Name :</label>
+            <input id="name" name="name" type="text" minlength="4" maxlength="8" size="10"><br/>
+            <label for="format">Encoding :</label>
             <input name="format" type="radio" value="bin" />Binary
             <input name="format" type="radio" value="hexa" checked />Hexa
             <br/>
-            <input id="compute" type="button" value="Compute" /><br/>
-            <input id="save" type="button" value="Save" />
-            <input id="load" type="button" value="Load" />
+            <div>
+                <input id="compute" type="button" value="Compute" /><br/>
+                <input id="save" type="button" value="Save" />
+                <input id="load" type="button" value="Load" />
+            </div>
         </div>
+        <div id="dialogSave" title="Save"></div>
+        <div id="dialogLoad" title="Load"></div>
     </body>
 </html>

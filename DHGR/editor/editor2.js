@@ -12,8 +12,14 @@ function isset(variable) {
     return false
 }
 
-function getHex(val) {
-    return val.toString(16).padStart(2, '0').toUpperCase()
+function BinHex(val) {
+    let hex = parseInt(val, 2).toString(16).padStart(2, '0').toUpperCase()
+    return hex
+}
+
+function DecHex(val) {
+    let hex = val.toString(16).padStart(2, '0').toUpperCase()
+    return hex
 }
 
 class Pack
@@ -78,7 +84,8 @@ class Pack
                 computedValue = paletteValue + octect
 
                 if (format == "bin") res[memSelector].push("#%"+ computedValue)
-                else res[memSelector].push(getHex(computedValue))
+                else res[memSelector].push(BinHex(computedValue))
+
                 memSelector = Math.abs(memSelector-1)
 
                 bits = this.bitsPerPixel - nb
@@ -92,8 +99,7 @@ class Pack
 
         computedValue = this.palette[this.getPaletteIndex(i-1)] + octect
         if (format == "bin") res[memSelector].push("#%"+computedValue)
-        else res[memSelector].push(getHex(computedValue))
-        console.log(res)
+        else res[memSelector].push(BinHex(computedValue))
         return res
     }
 
@@ -134,9 +140,10 @@ class Sprite
         }
     }
 
-    get(format) {
+    get(format, name) {
         let pixWidth = (this.width / NB_PIXELS_BY_PACK) * 2
         let totalBytes = pixWidth * this.height
+        this.name = name.toUpperCase()
 
         let macro = ""
         if (format == "bin") macro = "DA"
@@ -145,7 +152,7 @@ class Sprite
         var tmp = this.name+"<br/>"
         var aux = ""
         var main = ""
-        tmp += "&nbsp;&nbsp;&nbsp;&nbsp;.HS " + getHex(pixWidth) + "," + getHex(this.height) + "," + getHex(totalBytes) + "<br/>"
+        tmp += "&nbsp;&nbsp;&nbsp;&nbsp;.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "<br/>"
         tmp += "&nbsp;&nbsp;&nbsp;&nbsp;.DA #"+this.name+"_ALT,/"+this.name+"_ALT<br/>"
         this.grid.forEach(function(value) {
             let res = value.get(format)
@@ -157,7 +164,7 @@ class Sprite
         var aux = ""
         var main = ""
         tmp += "<br/>"+this.name+"_ALT<br/>"
-        tmp += "&nbsp;&nbsp;&nbsp;&nbsp;.HS " + getHex(pixWidth) + "," + getHex(this.height) + "," + getHex(totalBytes) + "<br/>"
+        tmp += "&nbsp;&nbsp;&nbsp;&nbsp;.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "<br/>"
         tmp += "&nbsp;&nbsp;&nbsp;&nbsp;.DA #"+this.name+",/"+this.name+"" + "<br/>"
         this.grid.forEach(function(value) {
             let res = value.get(format, ALT_MODE)
@@ -185,12 +192,58 @@ class Sprite
     }
 }
 
+function saveSprite() {
+    // $("#dialogSave").html(content)
+    $("#dialogSave").dialog("open");
+    // navigator.clipboard.writeText(content);
+}
+
+function storageAvailable(type) {
+    try {
+        var storage = window[type],
+            x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            storage.length !== 0;
+    }
+}
+
 $(document).ready(function()
 {
     var draw = document.getElementById("drawzone")
     var pal = document.getElementById("palette")
 
-    let sprite1 = new Sprite("hgr", 7, 8, "name")
+    if (!storageAvailable('localStorage')) {
+        alert("Pas de LocaStorage")
+    }
+
+    $("#dialogSave").dialog({
+        autoOpen: false,
+        width: 1000,
+        height: 500
+    });
+
+    $("#dialogLoad").dialog({
+        autoOpen: false,
+        width: 1000,
+        height: 700
+    });
+
+    let sprite1 = new Sprite("dhgr", 7, 8, "name")
     sprite1.render(draw)
     sprite1.displayPalette(pal)
 
@@ -210,9 +263,15 @@ $(document).ready(function()
     })
 
     $("#compute").on("click", function() {
+        let name = $("#name").val()
         let format = $('input[name=format]:checked').val()
-        let tmp = sprite1.get(format)
+        let tmp = sprite1.get(format, name)
         $("#output").html(tmp)
+    })
+
+    $("#save").on("click", saveSprite)
+    $("#load").on("click", function() {
+        $("#dialogLoad").dialog("open");
     })
 })
 
