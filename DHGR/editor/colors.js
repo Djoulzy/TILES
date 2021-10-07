@@ -36,7 +36,7 @@ var colors = [
         4: {
             0: {class: "orng", bin: "1100"},
             1: {class: "orng", bin: "1100"},
-            alt: {class: "orng", bin: "0111"},
+            alt: {class: "orng", bin: "0011"},
         }
     },
     {
@@ -45,7 +45,7 @@ var colors = [
         4: {
             0: {class: "dgrn", bin: "0010"},
             1: {class: "dgrn", bin: "0010"},
-            alt: {class: "dgrn", bin: "0001"},
+            alt: {class: "dgrn", bin: "1000"},
         }
     },
     {
@@ -85,7 +85,7 @@ var colors = [
         4: {
             0: {class: "dblu", bin: "0001"},
             1: {class: "dblu", bin: "0001"},
-            alt: {class: "dblu", bin: "1000"},
+            alt: {class: "dblu", bin: "0100"},
         }
     },
     {
@@ -107,7 +107,7 @@ var colors = [
         4: {
             0: {class: "gry2", bin: "0101"},
             1: {class: "gry2", bin: "0101"},
-            alt: {class: "gry2", bin: "1010"},
+            alt: {class: "gry2", bin: "0101"},
         }
     },
     {
@@ -125,15 +125,15 @@ var colors = [
         4: {
             0: {class: "mblu", bin: "0011"},
             1: {class: "mblu", bin: "0011"},
-            alt: {class: "mblu", bin: "0011"},
+            alt: {class: "mblu", bin: "1100"},
         }
     },
     {
         id: 13, // LIGHT BLUE
         2: {},
         4: {
-            0: {class: "lblu", bin: "1101"},
-            1: {class: "lblu", bin: "1101"},
+            0: {class: "lblu", bin: "1011"},
+            1: {class: "lblu", bin: "1011"},
             alt: {class: "lblu", bin: "1110"},
         }
     },

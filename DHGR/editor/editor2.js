@@ -190,7 +190,7 @@ $(document).ready(function()
     var draw = document.getElementById("drawzone")
     var pal = document.getElementById("palette")
 
-    let sprite1 = new Sprite("dhgr", 7, 16, "name")
+    let sprite1 = new Sprite("hgr", 7, 8, "name")
     sprite1.render(draw)
     sprite1.displayPalette(pal)
 
