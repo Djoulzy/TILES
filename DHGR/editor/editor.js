@@ -1,42 +1,12 @@
-var colorValues = {
-    blck: {val: 0, bin: "0000"},
-    dkbl: {val: 1, bin: "0001"},
-    dkgr: {val: 2, bin: "0010"},
-    mdbl: {val: 3, bin: "0011"},
-    brwn: {val: 4, bin: "0100"},
-    gry2: {val: 5, bin: "0101"},
-    gren: {val: 6, bin: "0110"},
-    aqua: {val: 7, bin: "0111"},
-    vilt: {val: 9, bin: "1001"},
-    gry1: {val: 10, bin: "1010"},
-    ltbl: {val: 11, bin: "1011"},
-    orge: {val: 12, bin: "1100"},
-    pink: {val: 13, bin: "1101"},
-    ylow: {val: 14, bin: "1110"},
-    whte: {val: 15, bin: "1111"},
-}
 
-var altColorValues = {
-    blck: {val: 0, bin: "0000"},
-    dkbl: {val: 1, bin: "0100"},
-    dkgr: {val: 2, bin: "0010"},
-    mdbl: {val: 3, bin: "1100"},
-    brwn: {val: 4, bin: "0001"},
-    gry2: {val: 5, bin: "0101"},
-    gren: {val: 6, bin: "1001"},
-    aqua: {val: 7, bin: "1101"},
-    vilt: {val: 9, bin: "0110"},
-    gry1: {val: 10, bin: "1010"},
-    ltbl: {val: 11, bin: "1110"},
-    orge: {val: 12, bin: "0011"},
-    pink: {val: 13, bin: "0111"},
-    ylow: {val: 14, bin: "1011"},
-    whte: {val: 15, bin: "1111"},
-}
+const NB_PIXELS_BY_PACK = 7
+const ALT_MODE = true
 
-var colorSelected = "blck"
-var pictoWidth = 0
-var pictoHeight = 0
+const urlParams = new URLSearchParams(window.location.search);
+
+var SelectedColorIndex = 0
+var SelectedPalette = 0
+var sprite
 
 function isset(variable) {
     if(typeof(variable) != "undefined" && variable !== null) {
@@ -45,223 +15,288 @@ function isset(variable) {
     return false
 }
 
-function displayDrawZone(width, height) {
-    pictoWidth = width
-    pictoHeight = height
+function BinHex(val) {
+    let hex = parseInt(val, 2).toString(16).padStart(2, '0').toUpperCase()
+    return hex
+}
 
-    var cpt = 1;
-    document.write('<table class="drawzone">')
-    for(let y = 1; y <= height; y++) {
-        document.write('    <tr>')
-        for(let x = 1; x <= width; x++) {
-            document.write('        <td id="'+cpt+'" class="drawcell blck" data-color="0000" data-name="blck"></td>')
-            cpt++
-        }
-        document.write('    </tr>')
+function DecHex(val) {
+    let hex = val.toString(16).padStart(2, '0').toUpperCase()
+    return hex
+}
+
+class Pack
+{
+    constructor(index, bitsPerPixel) {
+        this.index = index
+        this.pixelsInPack = NB_PIXELS_BY_PACK
+        this.bitsPerPixel = bitsPerPixel
+        this.nbBytes = bitsPerPixel
+
+        this.stack = new Array(this.pixelsInPack).fill(colors[0])
+        this.palette = new Array(this.bitsPerPixel).fill(0)
+        this.element = new Array(this.pixelsInPack)
     }
-    document.write('</table>')
-}
 
-function displayPreview() {
-    var cpt = 1;
-    document.write('<table class="preview" cellspacing="0" cellpadding="0">')
-    for(let y = 1; y <= pictoHeight; y++) {
-        document.write('    <tr>')
-        for(let x = 1; x <= pictoWidth; x++) {
-            document.write('        <td id="p'+cpt+'" class="previewcell blck"></td>')
-            cpt++
-        }
-        document.write('    </tr>')
+    getPaletteIndex(pos) {
+        let paletIndex = Math.floor((this.nbBytes / this.pixelsInPack) * pos)
+        return paletIndex
     }
-    document.write('</table>')
-}
 
-function displayPalette() {
-    document.write('<table class="palette">')
-    for (const [key, value] of Object.entries(colorValues)) {
-        document.write('\t<tr>')
-        document.write('\t\t<td id="'+key+'" class="paletteCell '+key+'"></td>')
-        document.write('\t</tr>')
-    }
-    document.write('</table>')
-}
-
-function displayResult(output) {
-    let format = $('input[name=format]:checked').val()
-    let prefix = ""
-    var out_aux = ""
-    var out_main = ""
-
-    if (format == 'bin') prefix = ".DA "
-    else prefix = ".HS "
-    for(let y = 0; y<output.length; y++) {
-        var aux = new Array
-        var main = new Array
-        for(let x = 0; x<output[y].length; x += 2) {
-            if (format == 'bin') {
-                aux.push("#%" + output[y][x])
-                main.push("#%" + output[y][x+1])
-            } else {
-                aux.push(parseInt(output[y][x], 2).toString(16).padStart(2, '0').toUpperCase())
-                main.push(parseInt(output[y][x+1], 2).toString(16).padStart(2, '0').toUpperCase())
-            }
-        }
-        out_aux += prefix + aux.join(",") + "<br/>"
-        out_main += prefix + main.join(",") + "<br/>"
-    }
-    let pixWidth = (pictoWidth / 7) * 2
-    let out  = ".HS " + pixWidth.toString(16).padStart(2, '0').toUpperCase()
-        + "," + pictoHeight.toString(16).padStart(2, '0').toUpperCase()
-        + "," + (pictoHeight*pixWidth).toString(16).padStart(2, '0').toUpperCase()
-        + "<br/>" + out_aux + out_main
-    $("#output").html(out)
-}
-
-function invertAndComplete(line) {
-    var binaries = new Array
-    for(let x = 0; x<line.length; x += 7) {
-        var tmp = ""
-        for(let cpt = 0; cpt<7; cpt++) {
-            tmp = line[x+cpt] + tmp
-        }
-        //tmp = "0000000000000000" + tmp
-        binaries.push(tmp)
-    }
-    console.log(binaries)
-    return binaries
-}
-
-function invertAndCompleteAlt(line) {
-    var binaries = new Array
-    for(let x = 0; x<line.length; x += 7) {
-        var tmp = ""
-        for(let cpt = 0; cpt<7; cpt++) {
-            tmp = line[x+cpt] + tmp
-        }
-        //tmp = "0000000000000000" + tmp
-        tmp += "00"
-        tmp = tmp.substr(2)
-        binaries.push(tmp)
-    }
-    console.log(binaries)
-    return binaries
-    // 000000000000000000000000111100
-    // 0000000000000000000000001111
-}
-
-function addPaletteBit(lines) {
-    var binaries = new Array
-    lines.forEach(function(val, index) {
-        let cpt = 6
-        let tmp = ""
-        for(let x = 0; x<val.length; x++) {
-            cpt++
-            if (cpt > 6) {
-                // if ((index == 0) && (x < 16) && (x > 8)) tmp += "1"
-                // else
-                tmp += "0"
-                cpt = 0
-            }
-            tmp += val[x]
-            // console.log(index, x, val[x])
-        }
-        binaries.push(tmp)
-    })
-    // console.log(binaries)
-    return binaries
-}
-
-function extractBytes(lines) {
-    var binaries = new Array
-    lines.forEach(function(val, index) {
-        var tmp = new Array
-        for(let x = 0; x<val.length; x += 8) {
-            tmp.push(val.substr(x, 8))
-        }
-        binaries = binaries.concat(tmp.reverse())
-    })
-    // console.log(binaries)
-    return binaries
-}
-
-function computeSprite() {
-    var cpt = 0
-    var line = 0
-    var output = new Array
-    $(".drawcell").each(function(index) {
-        if (!isset(output[line])) output[line] = new Array
-        output[line][cpt] = $(this).data("color")
-        cpt++
-        if (cpt == pictoWidth) {
-            output[line] = invertAndCompleteAlt(output[line])
-            output[line] = addPaletteBit(output[line])
-            output[line] = extractBytes(output[line])
-    
-            line++
-            cpt = 0
-        }
-    })
-
-    displayResult(output)
-}
-
-function saveSprite() {
-    var cpt = 0
-    var line = 0
-    var output = new Array
-    $(".drawcell").each(function(index) {
-        if (!isset(output[line])) output[line] = new Array
-        output[line][cpt] = $(this).data("name")
-        cpt++
-        if (cpt == pictoWidth) {    
-            line++
-            cpt = 0
-        }
-    })
-
-    let content = JSON.stringify(output)
-    $("#dialogSave").html(content)
-    $("#dialogSave").dialog("open");
-    navigator.clipboard.writeText(content);
-}
-
-function loadSprite() {
-    let data = JSON.parse($("#importData").val())
-    var cpt = 1
-    data.forEach(function(lines) {
-        lines.forEach(function(cols) {
-            colorSelected = cols
-            $("#"+cpt).trigger("click")
-            cpt++
+    updatePack() {
+        var parent = this;
+        this.stack.forEach(function(value, index) {
+            let bitsPerPixel = parent.bitsPerPixel.toString()
+            let paletteValue = parent.palette[parent.getPaletteIndex(index)].toString()
+            let colorValue = parent.stack[index][bitsPerPixel][paletteValue]
+            parent.element[index].className = "pixel "+ colorValue.class
+            // parent.element[index].innerHTML = colorValue.bin +"<br/>"+ parent.element[index].id + "<br/>"+ paletteValue
         })
+    }
+
+    setColor(pos, val, pal) {
+        this.stack[pos] = val
+        let paletIndex = this.getPaletteIndex(pos)
+        if (isset(pal)) {
+            if (pos == 3) {
+                this.palette[0] = this.palette[1] = pal
+            } else {
+                this.palette[paletIndex] = pal
+            }
+        }
+        this.updatePack()
+    }
+
+    get(format, altMode = false) {
+        var res = [[],[]]
+        var memSelector = 0
+        var octect = ""
+        var bits = 0
+        var computedValue = ""
+
+        for(var i=0; i<this.pixelsInPack; i++) {
+            let paletteValue = this.palette[this.getPaletteIndex(i)]
+            let colorValue
+            if (altMode) colorValue = this.stack[i][this.bitsPerPixel]["alt"]
+            else colorValue = this.stack[i][this.bitsPerPixel][paletteValue]
+            if (bits+this.bitsPerPixel > NB_PIXELS_BY_PACK) {
+                let nb = 7 - bits
+
+                octect = colorValue.bin.substr(-nb) + octect
+                computedValue = paletteValue + octect
+
+                if (format == "bin") res[memSelector].push("#%"+ computedValue)
+                else res[memSelector].push(BinHex(computedValue))
+
+                memSelector = Math.abs(memSelector-1)
+
+                bits = this.bitsPerPixel - nb
+                octect = colorValue.bin.substr(0, bits)
+            }  
+            else {
+                octect = colorValue.bin + octect
+                bits += this.bitsPerPixel
+            }
+        }
+
+        computedValue = this.palette[this.getPaletteIndex(i-1)] + octect
+        if (format == "bin") res[memSelector].push("#%"+computedValue)
+        else res[memSelector].push(BinHex(computedValue))
+        return res
+    }
+
+    save() {
+        var tmp = []
+        for(var i=0; i<this.pixelsInPack; i++) {
+            tmp.push([this.stack[i].id, this.palette[this.getPaletteIndex(i)]])
+        }
+        return tmp
+    }
+
+    render(parent) {
+        if (!isset(parent)) parent = document.body
+        for(var i=0; i<this.pixelsInPack; i++) {
+            this.element[i] = document.createElement('div')
+            this.element[i].id = "" + this.index + i
+            this.element[i].pack = this
+            this.element[i].posInPack = i
+            parent.appendChild(this.element[i]);
+        }
+        this.updatePack()
+    }
+}
+
+class Sprite
+{
+    constructor(type, width, height, name) {
+        this.type = type
+        this.width = parseInt(width, 10)
+        this.height = parseInt(height, 10)
+        this.name = name.toUpperCase()
+        this.nbPackPerLine = Math.round(width / NB_PIXELS_BY_PACK)
+        this.totalPacks = this.nbPackPerLine * height
+        this.grid = new Array(this.totalPacks)
+        
+        this.mode = 2
+        
+        switch(type) {
+            case 'mono':
+                this.mode = 1
+                break
+            case 'hgr':
+                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(i, 2)
+                this.mode = 2
+                break
+            case 'dhgr':
+                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(i, 4)
+                this.mode = 4
+                break
+        }
+    }
+
+    get(format, name) {
+        let pixWidth = (this.width / NB_PIXELS_BY_PACK) * 2
+        let totalBytes = pixWidth * this.height
+        this.name = name.toUpperCase()
+
+        let macro = ""
+        if (format == "bin") macro = "DA"
+        else macro = "HS"
+
+        var tmp = this.name+"\n"
+        var aux = ""
+        var main = ""
+        tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "\n"
+        tmp += "\t.DA #"+this.name+"_ALT,/"+this.name+"_ALT\n"
+        this.grid.forEach(function(value) {
+            let res = value.get(format)
+            aux += "\t." + macro + " " + res[0] + "\n"
+            main += "\t." + macro + " " + res[1] + "\n"
+        })
+        tmp += aux + main
+
+        var aux = ""
+        var main = ""
+        tmp += "\n"+this.name+"_ALT\n"
+        tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "\n"
+        tmp += "\t.DA #"+this.name+",/"+this.name+"" + "\n"
+        this.grid.forEach(function(value) {
+            let res = value.get(format, ALT_MODE)
+            aux += "\t." + macro + " " + res[0] + "\n"
+            main += "\t." + macro + " " + res[1] + "\n"
+        })
+        tmp += aux + main
+        return tmp
+    }
+
+    save() {
+        var tmp = new Object()
+
+        tmp.type = this.type
+        tmp.width = this.width
+        tmp.height = this.height
+        tmp.grid = []
+        this.grid.forEach(function(value) {
+            tmp.grid.push(value.save())
+        })
+        return tmp
+    }
+
+    render(tagId) {
+        var parent = this;
+        this.grid.forEach(function(value, index) {
+            value.render(tagId)
+            if ((index+1) % parent.nbPackPerLine == 0) {
+                var elemt = document.createElement('br');
+                tagId.appendChild(elemt);
+            }
+        })
+    }
+
+    displayPalette(tagId) {
+        colors.displayPalette(tagId, this.mode)
+    }
+}
+
+function saveSprite(sprite) {
+    let name = $("#name").val()
+    let value = sprite.save()
+    console.log(JSON.stringify(value))
+    localStorage.setItem(name, JSON.stringify(value))
+}
+
+function storageAvailable(type) {
+    try {
+        var storage = window[type],
+            x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            storage.length !== 0;
+    }
+}
+
+function initSprite(mode, width, height, name) {
+    var draw = document.getElementById("drawzone")
+    var pal = document.getElementById("palette")
+
+    $("#apply").hide()
+    $("#type").prop('disabled', true)
+    $("#size").prop('disabled', true)
+    sprite = new Sprite(mode, width, height, name)
+    sprite.render(draw)
+    sprite.displayPalette(pal)
+
+    $(".pixel").on("click", function() {
+        let packObject = $(this)[0].pack
+        let pos = $(this)[0].posInPack
+        packObject.setColor(pos, colors[SelectedColorIndex], SelectedPalette)
+    })
+
+    $(".paletteCell").on("click", function() {
+        let id = "#ColorCell_"+SelectedColorIndex+"_"+SelectedPalette
+        $(id).removeClass("selected")
+        SelectedColorIndex = $(this)[0].colorIndex
+        SelectedPalette = $(this)[0].paletteIndex
+        id = "#ColorCell_"+SelectedColorIndex+"_"+SelectedPalette
+        $(id).addClass("selected")
     })
 }
 
-$(document).ready(function() {
-    $(".paletteCell").on("click", function() {
-        $("#"+colorSelected).removeClass("selected")
-        colorSelected = $(this).attr("id")
-        $(this).addClass("selected")
-    })
+function loadSprite(name) {
+    let raw = localStorage.getItem(name)
+    if (raw !== null) {
+        let data = JSON.parse(raw)
+        initSprite(data.type, data.width, data.height, name)
+        data.grid.forEach(function(value, index) {
+            var pixId = "" + index
+            value.forEach(function(value, index) {
+                SelectedColorIndex = value[0]
+                SelectedPalette = value[1]
+                $("#"+pixId+index).trigger("click")
+            })
+        })
+    } else return
+}
 
-    $(".drawcell").on("click", function() {
-        let previewId = "#p" + $(this).attr("id")
-        $(this).removeClass()
-        $(previewId).removeClass()
-        $(this).addClass("drawcell "+colorSelected)
-        $(previewId).addClass("previewcell "+colorSelected)
-        $(this).data("color", colorValues[colorSelected].bin)
-        $(this).data("name", colorSelected)
-    })
-
-    $("#compute").on("click", computeSprite)
-    $("#save").on("click", saveSprite)
-    $("#load").on("click", function() {
-        $("#dialogLoad").dialog("open");
-    })
-    $("#import").on("click", loadSprite)
-
-    $("#black").addClass("selected")
+$(document).ready(function()
+{
+    if (!storageAvailable('localStorage')) {
+        alert("Pas de LocaStorage")
+    }
 
     $("#dialogSave").dialog({
         autoOpen: false,
@@ -274,4 +309,50 @@ $(document).ready(function() {
         width: 1000,
         height: 700
     });
+
+    $("#dialogOutput").dialog({
+        autoOpen: false,
+        width: 1000,
+        height: 700
+    });
+
+    $("#compute").on("click", function() {
+        let name = $("#name").val()
+        let format = $('input[name=format]:checked').val()
+        let tmp = sprite.get(format, name)
+
+        $("#dialogOutput").html("<pre>"+tmp+"</pre>")
+        $("#dialogOutput").dialog("open");
+        navigator.clipboard.writeText(tmp);
+    })
+
+    $("#save").on("click", function() {
+        saveSprite(sprite)
+        $("#dialogSave").html("Sprite <b>"+sprite.name+"</b> saved ...")
+        $("#dialogSave").dialog("open");
+    })
+
+    $("#load").on("click", function() {
+        console.log("load")
+        let list = Object.keys(localStorage)
+        var tmp = "<ul>"
+        list.forEach(function(value, index) {
+            tmp += '<li><a href="' + window.location.href.split('?')[0] + '?load=' + value + '">' + value + '</a></li>'
+        })
+        tmp += "</ul>"
+        $("#dialogLoad").html(tmp)
+        $("#dialogLoad").dialog("open");
+    })
+
+    $("#apply").on("click", function() {
+        let mode = $("#type").val()
+        let size = $("#size").val().split('x')
+        let name = $("#name").val()
+        initSprite(mode, size[0], size[1], name)
+    })
+
+    let loader = urlParams.get('load');
+    if (loader !== null) {
+        loadSprite(loader)
+    }
 })
