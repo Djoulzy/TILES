@@ -13,13 +13,27 @@
     <body>
         <div id="drawzone"></div>
         <div id="palette"></div>
-        <div class="inline">
-            <div class="title">Output</div>
-            <div id="output" class="output"></div>
-        </div>
         <div id="menu">
             <label for="name">Sprite Name :</label>
-            <input id="name" name="name" type="text" minlength="4" maxlength="8" size="10"><br/>
+            <input id="name" name="name" type="text" minlength="4" maxlength="8" size="10" value="Sprite1">
+            <br/>
+            <label for="type">Sprite type :</label>
+            <select name="type" id="type">
+                <option value="dhgr">DHGR</option>
+                <option value="hgr">HGR</option>
+                <option value="mono">Mono</option>
+            </select>
+            <br/>
+            <label for="size">Sprite size :</label>
+            <select name="size" id="size">
+                <option value="7x8">7x8</option>
+                <option value="7x16">7x16</option>
+                <option value="14x8">14x8</option>
+                <option value="14x16">14x16</option>
+            </select>
+            <br/>
+            <input id="apply" type="button" value="Apply" />
+            <br/>
             <label for="format">Encoding :</label>
             <input name="format" type="radio" value="bin" />Binary
             <input name="format" type="radio" value="hexa" checked />Hexa
@@ -32,5 +46,6 @@
         </div>
         <div id="dialogSave" title="Save"></div>
         <div id="dialogLoad" title="Load"></div>
+        <div id="dialogOutput" title="Output"></div>
     </body>
 </html>

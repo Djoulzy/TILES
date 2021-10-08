@@ -4,6 +4,7 @@ const ALT_MODE = true
 
 var SelectedColorIndex = 0
 var SelectedPalette = 0
+var sprite
 
 function isset(variable) {
     if(typeof(variable) != "undefined" && variable !== null) {
@@ -28,8 +29,6 @@ class Pack
         this.pixelsInPack = NB_PIXELS_BY_PACK
         this.bitsPerPixel = bitsPerPixel
         this.nbBytes = bitsPerPixel
-
-        let defaultValue = "0".repeat(bitsPerPixel)
 
         this.stack = new Array(this.pixelsInPack).fill(colors[0])
         this.palette = new Array(this.bitsPerPixel).fill(0)
@@ -101,6 +100,14 @@ class Pack
         if (format == "bin") res[memSelector].push("#%"+computedValue)
         else res[memSelector].push(BinHex(computedValue))
         return res
+    }
+
+    save() {
+        var tmp = []
+        for(var i=0; i<this.pixelsInPack; i++) {
+            tmp.push(this.stack[i].id)
+        }
+        return tmp
     }
 
     render(parent) {
@@ -175,6 +182,14 @@ class Sprite
         return tmp
     }
 
+    save() {
+        var tmp = []
+        this.grid.forEach(function(value) {
+            tmp.push(value.save("bin"))
+        })
+        return tmp
+    }
+
     render(tagId) {
         var parent = this;
         this.grid.forEach(function(value, index) {
@@ -192,10 +207,8 @@ class Sprite
     }
 }
 
-function saveSprite() {
-    // $("#dialogSave").html(content)
-    $("#dialogSave").dialog("open");
-    // navigator.clipboard.writeText(content);
+function saveSprite(sprite) {
+    localStorage.setItem(sprite.name, JSON.stringify(sprite.save()))
 }
 
 function storageAvailable(type) {
@@ -222,11 +235,18 @@ function storageAvailable(type) {
     }
 }
 
-$(document).ready(function()
-{
+function initSprite(mode, width, height, name) {
     var draw = document.getElementById("drawzone")
     var pal = document.getElementById("palette")
 
+    console.log(mode, width, height, name)
+    sprite = new Sprite(mode, width, height, name)
+    sprite.render(draw)
+    sprite.displayPalette(pal)
+}
+
+$(document).ready(function()
+{
     if (!storageAvailable('localStorage')) {
         alert("Pas de LocaStorage")
     }
@@ -243,9 +263,11 @@ $(document).ready(function()
         height: 700
     });
 
-    let sprite1 = new Sprite("dhgr", 7, 8, "name")
-    sprite1.render(draw)
-    sprite1.displayPalette(pal)
+    $("#dialogOutput").dialog({
+        autoOpen: false,
+        width: 1000,
+        height: 700
+    });
 
     $(".pixel").on("click", function() {
         let packObject = $(this)[0].pack
@@ -265,40 +287,28 @@ $(document).ready(function()
     $("#compute").on("click", function() {
         let name = $("#name").val()
         let format = $('input[name=format]:checked').val()
-        let tmp = sprite1.get(format, name)
-        $("#output").html(tmp)
+        let tmp = sprite.get(format, name)
+
+        $("#dialogOutput").html(tmp)
+        $("#dialogOutput").dialog("open");
+        navigator.clipboard.writeText(tmp);
     })
 
-    $("#save").on("click", saveSprite)
+    $("#save").on("click", function() {
+        saveSprite(sprite)
+    })
+
     $("#load").on("click", function() {
+        console.log("load")
+        let list = Object.keys(localStorage)
+        $("#dialogLoad").html(list)
         $("#dialogLoad").dialog("open");
     })
+
+    $("#apply").on("click", function() {
+        let mode = $("#type").val()
+        let size = $("#size").val().split('x')
+        let name = $("#name").val()
+        initSprite(mode, size[0], size[1], name)
+    })
 })
-
-// let obj1 = new Pack(2);
-
-// obj1.setColor(0, "AA", 0)
-// obj1.setColor(1, "BB", 0)
-// obj1.setColor(2, "CC", 0)
-// obj1.setColor(4, "EE", 0)
-// obj1.setColor(5, "FF", 0)
-// obj1.setColor(6, "GG", 0)
-// obj1.setColor(3, "12", 1)
-
-// document.write(obj1.get())
-// document.write(obj1.render())
-// document.write("<br/><br/>")
-
-// let obj2 = new Pack(4);
-
-// obj2.setColor(0, "AAAA")
-// obj2.setColor(1, "BBBB")
-// obj2.setColor(2, "CCCC")
-// obj2.setColor(3, "1234")
-// obj2.setColor(4, "EEEE")
-// obj2.setColor(5, "FFFF")
-// obj2.setColor(6, "GGGG")
-
-// document.write(obj2.get())
-// document.write("<br/><br/>")
-
