@@ -6,6 +6,11 @@ NEW
 *			.OR	$800
 *			.TF /DEV/TILES.HR/OBJ/HR.TOOLS
 *--------------------------------------
+INIT        STA GRAPHON         ;Turn on graphics
+            STA HIRESON         ;Turn on hi-res 
+            STA FULLON          ;Turn on fullscreen
+            RTS
+*--------------------------------------
 HR_CLR      LDX #$00        ;Start at byte 0
 .22         STA $2000,X
             STA $2100,X

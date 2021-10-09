@@ -1,6 +1,8 @@
 
 const NB_PIXELS_BY_PACK = 7
 const ALT_MODE = true
+const USE_AUX_MEM = true
+const NO_AUX_MEM = false
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -27,15 +29,23 @@ function DecHex(val) {
 
 class Pack
 {
-    constructor(index, bitsPerPixel) {
+    constructor(index, bitsPerPixel, pixSize, auxmem) {
         this.index = index
         this.pixelsInPack = NB_PIXELS_BY_PACK
         this.bitsPerPixel = bitsPerPixel
         this.nbBytes = bitsPerPixel
+        this.auxmem = auxmem
 
         this.stack = new Array(this.pixelsInPack).fill(colors[0])
         this.palette = new Array(this.bitsPerPixel).fill(0)
         this.element = new Array(this.pixelsInPack)
+
+        this.pixelClass = "pixel"
+        this.previewClass = "previewcell"
+        if (pixSize == 1) {
+            this.pixelClass = "pixel1"
+            this.previewClass = "previewcell1"
+        }
     }
 
     getPaletteIndex(pos) {
@@ -46,14 +56,13 @@ class Pack
     updatePack() {
         var parent = this;
         this.stack.forEach(function(value, index) {
-            let bitsPerPixel = parent.bitsPerPixel.toString()
-            let paletteValue = parent.palette[parent.getPaletteIndex(index)].toString()
-            let colorValue = parent.stack[index][bitsPerPixel][paletteValue]
-            parent.element[index].className = "pixel "+ colorValue.class
+            let paletteValue = parent.palette[parent.getPaletteIndex(index)]
+            let colorValue = parent.stack[index][parent.bitsPerPixel][paletteValue]
+            parent.element[index].className = parent.pixelClass + " "+ colorValue.class
 
             let prevId = "p" + parent.element[index].id
             let preview = document.getElementById(prevId)
-            preview.className = "previewcell "+ colorValue.class
+            preview.className = parent.previewClass +" "+ colorValue.class
             // parent.element[index].innerHTML = colorValue.bin +"<br/>"+ parent.element[index].id + "<br/>"+ paletteValue
         })
     }
@@ -92,7 +101,7 @@ class Pack
                 if (format == "bin") res[memSelector].push("#%"+ computedValue)
                 else res[memSelector].push(BinHex(computedValue))
 
-                memSelector = Math.abs(memSelector-1)
+                if (this.auxmem) memSelector = Math.abs(memSelector-1)
 
                 bits = this.bitsPerPixel - nb
                 octect = colorValue.bin.substr(0, bits)
@@ -142,24 +151,35 @@ class Sprite
         this.grid = new Array(this.totalPacks)
         
         this.mode = 2
+        this.modePalette = 2
         
         switch(type) {
-            case 'mono':
+            case 'mono_hgr':
+                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(i, 1, 1, NO_AUX_MEM)
                 this.mode = 1
+                this.modePalette = 1
                 break
             case 'hgr':
-                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(i, 2)
+                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(i, 2, 2, NO_AUX_MEM)
                 this.mode = 2
+                this.modePalette = 2
+                break
+            case 'mono_dhgr':
+                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(i, 2, 1, USE_AUX_MEM)
+                this.mode = 3
+                this.modePalette = 1
                 break
             case 'dhgr':
-                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(i, 4)
+                for(let i=0; i<this.totalPacks; i++) this.grid[i] = new Pack(i, 4, 2, USE_AUX_MEM)
                 this.mode = 4
+                this.modePalette = 4
                 break
         }
     }
 
     get(format, name) {
-        let pixWidth = (this.width / NB_PIXELS_BY_PACK) * 2
+        let pixWidth = (this.width / NB_PIXELS_BY_PACK)
+        if ((this.mode == 2) || (this.mode == 4)) pixWidth *= 2
         let totalBytes = pixWidth * this.height
         this.name = name.toUpperCase()
 
@@ -167,29 +187,32 @@ class Sprite
         if (format == "bin") macro = "DA"
         else macro = "HS"
 
+        var parent = this
         var tmp = this.name+"\n"
         var aux = ""
         var main = ""
         tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "\n"
-        tmp += "\t.DA #"+this.name+"_ALT,/"+this.name+"_ALT\n"
+        if (this.mode > 2) tmp += "\t.DA #"+this.name+"_ALT,/"+this.name+"_ALT\n"
         this.grid.forEach(function(value) {
             let res = value.get(format)
             aux += "\t." + macro + " " + res[0] + "\n"
-            main += "\t." + macro + " " + res[1] + "\n"
+            if (parent.mode > 2) main += "\t." + macro + " " + res[1] + "\n"
         })
         tmp += aux + main
 
-        var aux = ""
-        var main = ""
-        tmp += "\n"+this.name+"_ALT\n"
-        tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "\n"
-        tmp += "\t.DA #"+this.name+",/"+this.name+"" + "\n"
-        this.grid.forEach(function(value) {
-            let res = value.get(format, ALT_MODE)
-            aux += "\t." + macro + " " + res[0] + "\n"
-            main += "\t." + macro + " " + res[1] + "\n"
-        })
-        tmp += aux + main
+        if (this.mode > 2) {
+            var aux = ""
+            var main = ""
+            tmp += "\n"+this.name+"_ALT\n"
+            tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "\n"
+            tmp += "\t.DA #"+this.name+",/"+this.name+"" + "\n"
+            this.grid.forEach(function(value) {
+                let res = value.get(format, ALT_MODE)
+                aux += "\t." + macro + " " + res[0] + "\n"
+                main += "\t." + macro + " " + res[1] + "\n"
+            })
+            tmp += aux + main
+        }
         return tmp
     }
 
@@ -218,7 +241,7 @@ class Sprite
     }
 
     displayPalette(tagId) {
-        colors.displayPalette(tagId, this.mode)
+        colors.displayPalette(tagId, this.modePalette)
     }
 
     displayPreview(tagId) {
@@ -278,11 +301,19 @@ function initSprite(mode, width, height, name) {
     sprite.render(draw)
     sprite.displayPalette(pal)
 
-    $(".pixel").on("click", function() {
-        let packObject = $(this)[0].pack
-        let pos = $(this)[0].posInPack
-        packObject.setColor(pos, colors[SelectedColorIndex], SelectedPalette)
-    })
+    if ((mode = "mono_hgr") || (mode = "mono_dhgr")) {
+        $(".pixel1").on("click", function() {
+            let packObject = $(this)[0].pack
+            let pos = $(this)[0].posInPack
+            packObject.setColor(pos, colors[SelectedColorIndex], SelectedPalette)
+        })
+    } else {
+        $(".pixel").on("click", function() {
+            let packObject = $(this)[0].pack
+            let pos = $(this)[0].posInPack
+            packObject.setColor(pos, colors[SelectedColorIndex], SelectedPalette)
+        })
+    }
 
     $(".paletteCell").on("click", function() {
         let id = "#ColorCell_"+SelectedColorIndex+"_"+SelectedPalette

@@ -1,10 +1,15 @@
 var colors = [
     {
         id: 0, // BLACK
+        1: {
+            0: {class: "blck", bin: "0"},
+            1: {},
+            alt: {}
+        },
         2: {
             0: {class: "blck", bin: "00"},
             1: {class: "blck", bin: "00"},
-            alt: {}
+            alt: {class: "blck", bin: "00"}
         },
         4: {
             0: {class: "blck", bin: "0000"},
@@ -148,10 +153,15 @@ var colors = [
     },
     {
         id: 15, // WHITE
+        1: {
+            0: {class: "whte", bin: "1"},
+            1: {},
+            alt: {}
+        },
         2: {
             0: {class: "whte", bin: "11"},
             1: {class: "whte", bin: "11"},
-            alt: {}
+            alt: {class: "whte", bin: "11"}
         },
         4: {
             0: {class: "whte", bin: "1111"},
@@ -167,6 +177,17 @@ colors.get = function(index, mode, palette) {
 
 colors.displayPalette = function(tagId, mode) {
     switch(mode) {
+        case 1:
+            let monoColors = [0, 15]
+            monoColors.forEach(function(value) {
+                let colorValue = colors.get(value, 2, 0)
+                let elmt = document.createElement('div')
+                elmt.id = "ColorCell_" + value + "_"
+                elmt.className = "paletteCell " + colorValue.class
+                elmt.colorIndex = value
+                tagId.appendChild(elmt)
+            })
+            break
         case 2:
             let hgrColors = [0, 6, 9, 15]
             hgrColors.forEach(function(value) {

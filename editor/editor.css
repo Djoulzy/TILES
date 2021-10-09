@@ -38,6 +38,16 @@ body {
     border-color:black;
 }
 
+.pixel1 {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-width:1px;
+    margin: 2px;
+    border-style:solid; 
+    border-color:black;
+}
+
 #palette {
     display: inline-block;
     border-width:1px;
@@ -72,6 +82,13 @@ body {
 .previewcell {
     display: inline-block;
     width: 8px;
+    height: 4px;
+    background-color: black;
+}
+
+.previewcell1 {
+    display: inline-block;
+    width: 4px;
     height: 4px;
     background-color: black;
 }

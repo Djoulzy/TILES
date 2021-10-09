@@ -13,11 +13,6 @@ AUTO 4,1
 			.INB /DEV/TILES.HR/SRC/HR.SPRITE.S
 *           .INB /DEV/TILES.HR/SRC/DIV7.S
 *--------------------------------------
-INIT        STA GRAPHON         ;Turn on graphics
-            STA HIRESON         ;Turn on hi-res 
-            STA FULLON          ;Turn on fullscreen
-            RTS
-*--------------------------------------
 			.MA WAITVBL
 :1			BIT VBL
             BPL :1

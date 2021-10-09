@@ -22,44 +22,45 @@ AUTO 4,1
             .EM
 *--------------------------------------
 NAME
-    .HS 02,08,10
-    .DA #NAME_ALT,/NAME_ALT
-    .HS 08,00
-    .HS 00,00
-    .HS 00,00
-    .HS 00,02
-    .HS 00,20
-    .HS 00,00
-    .HS 00,00
-    .HS 00,00
-    .HS 00,00
-    .HS 01,00
-    .HS 10,00
-    .HS 00,00
-    .HS 00,00
-    .HS 00,04
-    .HS 00,40
-    .HS 00,00
+	.HS 01,08,08
+	.DA #NAME_ALT,/NAME_ALT
+	.HS 00
+	.HS 00
+	.HS 7C
+	.HS 00
+	.HS 7C
+	.HS 03
+	.HS 7C
+	.HS 00
+	.HS 00
+	.HS 00
+	.HS 01
+	.HS 06
+	.HS 07
+	.HS 06
+	.HS 07
+	.HS 00
 
 NAME_ALT
-    .HS 02,08,10
-    .DA #NAME,/NAME
-    .HS 02,00
-    .HS 20,00
-    .HS 00,00
-    .HS 00,00
-    .HS 00,08
-    .HS 00,00
-    .HS 00,00
-    .HS 00,00
-    .HS 00,00
-    .HS 00,00
-    .HS 04,00
-    .HS 40,00
-    .HS 00,00
-    .HS 00,01
-    .HS 00,10
-    .HS 00,00
+	.HS 01,08,08
+	.DA #NAME,/NAME
+	.HS 00
+	.HS 00
+	.HS 7C
+	.HS 00
+	.HS 7C
+	.HS 03
+	.HS 7C
+	.HS 00
+	.HS 00
+	.HS 00
+	.HS 01
+	.HS 06
+	.HS 07
+	.HS 06
+	.HS 07
+	.HS 00
+
 *--------------------------------------
 ;  0: Coord X
 ; +1: Coord Y
