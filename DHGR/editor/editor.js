@@ -50,6 +50,10 @@ class Pack
             let paletteValue = parent.palette[parent.getPaletteIndex(index)].toString()
             let colorValue = parent.stack[index][bitsPerPixel][paletteValue]
             parent.element[index].className = "pixel "+ colorValue.class
+
+            let prevId = "p" + parent.element[index].id
+            let preview = document.getElementById(prevId)
+            preview.className = "previewcell "+ colorValue.class
             // parent.element[index].innerHTML = colorValue.bin +"<br/>"+ parent.element[index].id + "<br/>"+ paletteValue
         })
     }
@@ -216,12 +220,24 @@ class Sprite
     displayPalette(tagId) {
         colors.displayPalette(tagId, this.mode)
     }
+
+    displayPreview(tagId) {
+        for (var j=0; j<this.height; j++) {
+            for (var i=0; i<this.width; i++) {
+                var elemt = document.createElement('div');
+                elemt.id = "p"+j+i
+                elemt.className = "previewcell"
+                tagId.appendChild(elemt);
+            }
+            var elemt = document.createElement('br');
+            tagId.appendChild(elemt);
+        }
+    }
 }
 
 function saveSprite(sprite) {
     let name = $("#name").val()
     let value = sprite.save()
-    console.log(JSON.stringify(value))
     localStorage.setItem(name, JSON.stringify(value))
 }
 
@@ -252,11 +268,13 @@ function storageAvailable(type) {
 function initSprite(mode, width, height, name) {
     var draw = document.getElementById("drawzone")
     var pal = document.getElementById("palette")
+    var prev = document.getElementById("preview")
 
     $("#apply").hide()
     $("#type").prop('disabled', true)
     $("#size").prop('disabled', true)
     sprite = new Sprite(mode, width, height, name)
+    sprite.displayPreview(prev)
     sprite.render(draw)
     sprite.displayPalette(pal)
 
@@ -333,7 +351,6 @@ $(document).ready(function()
     })
 
     $("#load").on("click", function() {
-        console.log("load")
         let list = Object.keys(localStorage)
         var tmp = "<ul>"
         list.forEach(function(value, index) {

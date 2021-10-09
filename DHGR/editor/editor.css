@@ -9,22 +9,31 @@ body {
     vertical-align: top;
 }
 
+#dashboard {
+    display:inline-block;
+}
+
+#tools {
+    display:inline-block;
+    vertical-align: top;
+}
+
 #drawzone {
     display: inline-block;
     vertical-align: top;
     border-width:1px; 
     border-style:solid; 
     border-color:#00D53A;
-    padding-top: 3px;
+    padding: 2px;
+    font-size: 0;
 }
 
 .pixel {
     display: inline-block;
-    width: 30px;
+    width: 60px;
     height: 30px;
     border-width:1px;
-    margin-left: 2px;
-    margin-right: 2px;
+    margin: 2px;
     border-style:solid; 
     border-color:black;
 }
@@ -33,7 +42,8 @@ body {
     display: inline-block;
     border-width:1px;
     border-style:solid; 
-    border-color:black;
+    border-color:#00D53A;
+    font-size: 0;
 }
 
 #menu {
@@ -51,15 +61,19 @@ body {
     margin: 1px;
 }
 
-.preview { /* Ration 1.78 */
+#preview { /* Ration 1.78 */
+    display: inline-block;
     border-width:1px; 
     border-style:solid; 
-    border-color:black;
+    border-color:#00D53A;
+    font-size: 0;
 }
 
 .previewcell {
+    display: inline-block;
     width: 8px;
     height: 4px;
+    background-color: black;
 }
 
 .paletteCell {
