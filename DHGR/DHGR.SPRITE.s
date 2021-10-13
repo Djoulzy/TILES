@@ -135,7 +135,7 @@ DRAW_SHAPE
             DEY
 
 .02			DEX
-            BMI END_DRAW_SHAPE
+            BEQ END_DRAW_SHAPE
 .03			LDA $AAAA,X
             STA PAGE2           ; Bascule vers AUX
 .04         STA $AAAA,Y         ; STA (SCRN_LO),Y

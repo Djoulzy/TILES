@@ -49,10 +49,8 @@ STAR3_NFO   .HS 24,06,81,00,00,00
 STAR4_NFO   .HS 20,18,81,00,00,00
             .DA #STAR,/STAR
 
-PLANET_NFO  .HS 22,00,01,01,00,00
+PLANET_NFO  .HS 00,0C,00,00,00,00
             .DA #PLANET,/PLANET
-PLANET2_NFO .HS 22,10,01,01,00,00
-            .DA #PLANET2,/PLANET2
 *--------------------------------------
 MV_MONSTER
             LDY #$03                ; Lecture de speed Y
@@ -113,11 +111,6 @@ GAMELOOP
             LDA /PLANET_NFO
             STA SPRT_INF_HI
             JSR DRAW_SPRITE
-            LDA #PLANET2_NFO
-            STA SPRT_INF_LO
-            LDA /PLANET2_NFO
-            STA SPRT_INF_HI
-            JSR DRAW_SPRITE
 
             LDA #STAR1_NFO
             STA SPRT_INF_LO
@@ -146,6 +139,7 @@ GAMELOOP
             STA SPRT_INF_HI
             JSR MV_SPRITE
             JSR DRAW_SPRITE
+            
             LDA #OBJ1_NFO
             STA SPRT_INF_LO
             LDA /OBJ1_NFO

@@ -130,7 +130,7 @@ class Pack
         if (!isset(parent)) parent = document.body
         for(var i=0; i<this.pixelsInPack; i++) {
             this.element[i] = document.createElement('div')
-            this.element[i].id = "" + this.index + i
+            this.element[i].id = this.index + "_" + i
             this.element[i].pack = this
             this.element[i].posInPack = i
             parent.appendChild(this.element[i]);
@@ -245,12 +245,16 @@ class Sprite
     }
 
     displayPreview(tagId) {
+        var cpt = 0
         for (var j=0; j<this.height; j++) {
-            for (var i=0; i<this.width; i++) {
-                var elemt = document.createElement('div');
-                elemt.id = "p"+j+i
-                elemt.className = "previewcell"
-                tagId.appendChild(elemt);
+            for (var p=0; p<this.nbPackPerLine; p++) {
+                for (var i=0; i<NB_PIXELS_BY_PACK; i++) {
+                    var elemt = document.createElement('div');
+                    elemt.id = "p" + cpt + "_" + i
+                    elemt.className = "previewcell"
+                    tagId.appendChild(elemt);
+                }
+                cpt++
             }
             var elemt = document.createElement('br');
             tagId.appendChild(elemt);
@@ -264,13 +268,45 @@ function saveSprite(sprite) {
     localStorage.setItem(name, JSON.stringify(value))
 }
 
+function download(sprite) {
+    let filename = $("#name").val() + ".json"
+    let data = JSON.stringify(sprite.save())
+    var file = new Blob([data], {type: "text/plain"})
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, filename)
+    else { // Others
+        var a = document.createElement("a"),
+                url = URL.createObjectURL(file)
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        setTimeout(function() {
+            document.body.removeChild(a)
+            window.URL.revokeObjectURL(url)
+        }, 0)
+    }
+}
+
+function upload(e) {
+    var file = e.target.files[0]
+    if (!file) return
+
+    var reader = new FileReader()
+    reader.onload = function(e) {
+        var contents = e.target.result
+        console.log(contents)
+    };
+    reader.readAsText(file)
+}
+
 function storageAvailable(type) {
     try {
         var storage = window[type],
-            x = '__storage_test__';
-        storage.setItem(x, x);
-        storage.removeItem(x);
-        return true;
+            x = '__storage_test__'
+        storage.setItem(x, x)
+        storage.removeItem(x)
+        return true
     }
     catch(e) {
         return e instanceof DOMException && (
@@ -284,7 +320,7 @@ function storageAvailable(type) {
             // Firefox
             e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
             // acknowledge QuotaExceededError only if there's something already stored
-            storage.length !== 0;
+            storage.length !== 0
     }
 }
 
@@ -301,7 +337,7 @@ function initSprite(mode, width, height, name) {
     sprite.render(draw)
     sprite.displayPalette(pal)
 
-    if ((mode = "mono_hgr") || (mode = "mono_dhgr")) {
+    if ((mode == "mono_hgr") || (mode == "mono_dhgr")) {
         $(".pixel1").on("click", function() {
             let packObject = $(this)[0].pack
             let pos = $(this)[0].posInPack
@@ -335,7 +371,7 @@ function loadSprite(name) {
             value.forEach(function(value, index) {
                 SelectedColorIndex = value[0]
                 SelectedPalette = value[1]
-                $("#"+pixId+index).trigger("click")
+                $("#"+pixId+"_"+index).trigger("click")
             })
         })
     } else return
@@ -380,6 +416,12 @@ $(document).ready(function()
         $("#dialogSave").html("Sprite <b>"+sprite.name+"</b> saved ...")
         $("#dialogSave").dialog("open");
     })
+
+    $("#export").on("click", function() {
+        download(sprite)
+    })
+
+    $("#import").on("change", upload)
 
     $("#load").on("click", function() {
         let list = Object.keys(localStorage)
