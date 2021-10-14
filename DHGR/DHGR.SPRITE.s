@@ -83,6 +83,49 @@ DEL_ZONE
 END_DEL_ZONE
             RTS
 *--------------------------------------
+; Input:
+; A: Nb lines 
+; X: Total bytes
+; Y: Nb bytes per line
+; Coord zone    -> SPRT_X, SPRT_Y
+;
+; Output:
+; void
+FILL_AREA
+            STY .02+1           ; Récriture (Nb bytes per line)
+
+            CLC
+            ADC SPRT_Y
+            STA SPRT_Y
+
+.01			DEC SPRT_Y
+            LDY SPRT_Y          ; On cherche la position memoire de Y
+			LDA HTAB_HI,Y		; Find the high byte of the row address
+            STA .04+2           ; On réecrit l'instruction .4 et .6 pour placer
+            STA .06+2           ; l'adresse du début de ligne 
+			LDA HTAB_LO,Y		; Find the low byte of the row address
+            CLC
+            ADC SPRT_X
+            STA .04+1           ; On réecrit l'instruction .4 et .6 pour placer
+            STA .06+1           ; l'adresse du début de ligne 
+
+.02			LDY #$AA
+            DEY
+
+.03			DEX
+            BMI END_FILL_AREA
+            LDA #$00
+            STA PAGE2           ; Bascule vers AUX
+.04         STA $AAAA,Y
+            STA PAGE1           ; Bascule vers MAIN
+.06         STA $AAAA,Y
+            DEY
+            BMI	.01             ; Fin d'une ligne		
+            JMP .03
+
+END_FILL_AREA
+            RTS
+*--------------------------------------
 ; Dessine une image en mode DHGR
 ;
 ; Input:
@@ -128,13 +171,13 @@ DRAW_SHAPE
             ADC SPRT_X
             STA .04+1           ; On réecrit l'instruction .4 et .6 pour placer
             STA .06+1           ; l'adresse du début de ligne 
-
-            LDY #$00            ; Mise en place du compteur de byte par ligne
-            LDA (SHAPE_LO),Y 
+        
+            LDA (SHAPE_LO)      ; Mise en place du compteur de byte par ligne
             TAY                 ; Y sert de compteur
             DEY
 
 .02			DEX
+            CPX #$FF
             BEQ END_DRAW_SHAPE
 .03			LDA $AAAA,X
             STA PAGE2           ; Bascule vers AUX

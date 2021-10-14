@@ -12,7 +12,9 @@ AUTO 4,1
 			.INB /DEV/TILES/SRC/DHGR.TOOLS.S
 			.INB /DEV/TILES/SRC/RND.S
 			.INB /DEV/TILES/SRC/DHGR.SPRITE.S
+            .INB /DEV/TILES/SRC/BKGROUND.S
             .INB /DEV/TILES/SRC/PLAYER.S
+            .INB /DEV/TILES/SRC/ENEMY.S
 *--------------------------------------
 			.MA WAITVBL
 :1			BIT VBL
@@ -21,148 +23,15 @@ AUTO 4,1
             BMI :2
             .EM
 *--------------------------------------
-;  0: Coord X
-; +1: Coord Y
-; +2: Speed X
-; +3: Speed Y
-; +4: Timer Default
-; +5: Timer compter
-; +6: Sprite def LO
-; +7: Sprite def HI
-PLYR_NFO    .HS 00,0C,00,00,00,00
-            .DA #PLAYER,/PLAYER
-OBJ1_NFO    .HS 24,06,00,01,00,00
-            .DA #MONSTER,/MONSTER
-OBJ2_NFO    .HS 20,06,00,81,00,00
-            .DA #MONSTER,/MONSTER
-OBJ3_NFO    .HS 1C,06,00,01,00,00
-            .DA #MONSTER,/MONSTER
-OBJ4_NFO    .HS 18,06,00,81,00,00
-            .DA #MONSTER,/MONSTER
-
-STAR1_NFO   .HS 24,06,81,00,00,00
-            .DA #STAR,/STAR
-STAR2_NFO   .HS 18,24,81,00,00,00
-            .DA #STAR,/STAR
-STAR3_NFO   .HS 24,06,81,00,00,00
-            .DA #STAR,/STAR
-STAR4_NFO   .HS 20,18,81,00,00,00
-            .DA #STAR,/STAR
-
-PLANET_NFO  .HS 00,0C,00,00,00,00
-            .DA #PLANET,/PLANET
-*--------------------------------------
-MV_MONSTER
-            LDY #$03                ; Lecture de speed Y
-            LDA #$8F
-            AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
-            BEQ .04                 ; Si c'est zero : pas de mouvements
-            BPL .06                 ; sinon on branche
-
-            ; Decrementation de Y
-            LDY #$01
-            LDA (SPRT_INF_LO),Y     ; On charge Coord Y
-            DEC
-            TAX
-            BNE .3                  ; On teste si on atteint le haut de l'écran
-            LDA #$01                ; Oui, on passe Speed Y en positif
-            JMP .2
-
-            ; Incrementation de Y
-.06         LDY #$01
-            LDA (SPRT_INF_LO),Y     ; On charge Coord Y        
-            INC
-            TAX
-            CMP #$B0                ; On teste si on atteint le bas de l'ecran
-            BNE .3                  ; non, on sort 
-            LDA #$81                ; Valeur negative pour Speed Y
-
-.2          LDY #$03          
-            STA (SPRT_INF_LO),Y     ; Sauvegarde de la nouvelle vitesse
-.3          LDY #$01
-            TXA
-            STA (SPRT_INF_LO),Y     ; Sauvegarde de Coord Y
-.4          JSR DRAW_SPRITE
-            RTS
 
 RUN         JSR INIT
             JSR RESEED
             LDA #$00
             JSR DHGR_CLR
 
-;            LDA #$B0
-;            STA MODULO
-;            JSR RANDOM
-;            STA OBJ1_NFO+1
-;
-;            LDA #$B0
-;            STA MODULO
-;            JSR RANDOM
-;            STA OBJ2_NFO+1
-;
-;            LDA #$B0
-;            STA MODULO
-;            JSR RANDOM
-;            STA OBJ3_NFO+1
-
 GAMELOOP
-            LDA #PLANET_NFO
-            STA SPRT_INF_LO
-            LDA /PLANET_NFO
-            STA SPRT_INF_HI
-            JSR DRAW_SPRITE
-
-            LDA #STAR1_NFO
-            STA SPRT_INF_LO
-            LDA /STAR1_NFO
-            STA SPRT_INF_HI
-            JSR MV_SPRITE
-            JSR DRAW_SPRITE
-
-            LDA #STAR2_NFO
-            STA SPRT_INF_LO
-            LDA /STAR2_NFO
-            STA SPRT_INF_HI
-            JSR MV_SPRITE
-            JSR DRAW_SPRITE
-
-            LDA #STAR3_NFO
-            STA SPRT_INF_LO
-            LDA /STAR3_NFO
-            STA SPRT_INF_HI
-            JSR MV_SPRITE
-            JSR DRAW_SPRITE
-
-            LDA #STAR4_NFO
-            STA SPRT_INF_LO
-            LDA /STAR4_NFO
-            STA SPRT_INF_HI
-            JSR MV_SPRITE
-            JSR DRAW_SPRITE
-            
-            LDA #OBJ1_NFO
-            STA SPRT_INF_LO
-            LDA /OBJ1_NFO
-            STA SPRT_INF_HI
-            JSR MV_MONSTER
-
-            LDA #OBJ2_NFO
-            STA SPRT_INF_LO
-            LDA /OBJ2_NFO
-            STA SPRT_INF_HI
-            JSR MV_MONSTER
-
-            LDA #OBJ3_NFO
-            STA SPRT_INF_LO
-            LDA /OBJ3_NFO
-            STA SPRT_INF_HI
-            JSR MV_MONSTER
-
-            LDA #OBJ4_NFO
-            STA SPRT_INF_LO
-            LDA /OBJ4_NFO
-            STA SPRT_INF_HI
-            JSR MV_MONSTER
+            JSR BKGROUND
+            JSR ENEMY
 
             JSR MV_PLAYER
 

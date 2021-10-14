@@ -184,32 +184,55 @@ class Sprite
         this.name = name.toUpperCase()
 
         let macro = ""
-        if (format == "bin") macro = "DA"
-        else macro = "HS"
+        if (format == "bin") macro = "\t.DA "
+        else macro = "\t.HS "
 
         var parent = this
         var tmp = this.name+"\n"
         var aux = ""
         var main = ""
-        tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "\n"
-        if (this.mode > 2) tmp += "\t.DA #"+this.name+"_ALT,/"+this.name+"_ALT\n"
+        var newLineCpt = 0
+        tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes)
+        if (this.mode > 2) tmp += "\n\t.DA #"+this.name+"_ALT,/"+this.name+"_ALT"
         this.grid.forEach(function(value) {
             let res = value.get(format)
-            aux += "\t." + macro + " " + res[0] + "\n"
-            if (parent.mode > 2) main += "\t." + macro + " " + res[1] + "\n"
+
+            newLineCpt--
+            if (newLineCpt <= 0) {
+                aux += "\n"+macro
+                if (parent.mode > 2) main += "\n"+macro
+                newLineCpt = 8
+            } else {
+                aux += ","
+                if (parent.mode > 2) main += ","
+            }
+
+            aux += res[0]
+            if (parent.mode > 2) main += res[1]
         })
         tmp += aux + main
 
         if (this.mode > 2) {
             var aux = ""
             var main = ""
+            newLineCpt = 0
             tmp += "\n"+this.name+"_ALT\n"
-            tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes) + "\n"
-            tmp += "\t.DA #"+this.name+",/"+this.name+"" + "\n"
+            tmp += "\t.HS " + DecHex(pixWidth) + "," + DecHex(this.height) + "," + DecHex(totalBytes)
+            tmp += "\n\t.DA #"+this.name+",/"+this.name
             this.grid.forEach(function(value) {
                 let res = value.get(format, ALT_MODE)
-                aux += "\t." + macro + " " + res[0] + "\n"
-                main += "\t." + macro + " " + res[1] + "\n"
+                newLineCpt--
+                if (newLineCpt <= 0) {
+                    aux += "\n"+macro
+                    main += "\n"+macro
+                    newLineCpt = 8
+                } else {
+                    aux += ","
+                    main += ","
+                }
+    
+                aux += res[0]
+                main += res[1]
             })
             tmp += aux + main
         }
