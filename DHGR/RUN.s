@@ -17,10 +17,10 @@ AUTO 4,1
             .INB /DEV/TILES/SRC/ENEMY.S
 *--------------------------------------
 			.MA WAITVBL
-:1			BIT VBL
-            BPL :1
-:2			BIT VBL
-            BMI :2
+:01			BIT VBL
+            BPL :01
+:02			BIT VBL
+            BMI :02
             .EM
 *--------------------------------------
 

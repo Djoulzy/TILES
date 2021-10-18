@@ -14,16 +14,16 @@ NEW
 ; +5: Timer compter
 ; +6: Sprite def LO
 ; +7: Sprite def HI
-STAR1_NFO   .HS 08,06,81,00,00,00
+STAR1_NFO   .HS 08,06,81,00,00,00,01
             .DA #STAR,/STAR
-STAR2_NFO   .HS 18,24,81,00,00,00
+STAR2_NFO   .HS 18,24,81,00,00,00,01
             .DA #STAR,/STAR
-STAR3_NFO   .HS 24,06,81,00,00,00
+STAR3_NFO   .HS 24,06,81,00,00,00,01
             .DA #STAR,/STAR
-STAR4_NFO   .HS 12,18,81,00,00,00
+STAR4_NFO   .HS 12,18,81,00,00,00,01
             .DA #STAR,/STAR
 
-PLANET_NFO  .HS 22,00,00,00,00,00
+PLANET_NFO  .HS 22,00,00,00,00,00,01
             .DA #PLANET,/PLANET
 
 NB_OBJ      .HS 09
@@ -52,6 +52,11 @@ BKGROUND
 
             LDA #$24
             STA (SPRT_INF_LO)
+            LDA #$B0
+            STA MODULO
+            JSR RANDOM
+            LDY SPRT_COORD_Y
+            STA (SPRT_INF_LO),Y
 .02         JSR DRAW_SPRITE
             PLY
             BPL .01

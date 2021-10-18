@@ -7,7 +7,7 @@ NEW
 *			.TF /DEV/TILES/OBJ/DHGR.SPRITE
 *--------------------------------------
             .MA GET_SHAPE
-            LDY #$06                ; Récupération du shape (pos 6 et 7)
+            LDY SPRT_SHAPE_LO       ; Récupération du shape (pos 6 et 7)
             LDA (SPRT_INF_LO),Y
             STA SHAPE_LO
             INY
@@ -15,20 +15,18 @@ NEW
             STA SHAPE_HI
             .EM
 *--------------------------------------
-            .MA GET_COORD
-            LDY #$00                ; Récupération des coord (pos 0 et 1)
-            LDA (SPRT_INF_LO),Y
+            .MA GET_COORD       
+            LDA (SPRT_INF_LO)       ; Récupération des coord (pos 0 et 1)
             STA SPRT_X
-            INY
+            LDY SPRT_COORD_Y
             LDA (SPRT_INF_LO),Y
             STA SPRT_Y
             .EM
 *--------------------------------------
             .MA SAVE_COORD
-            LDY #$00
             LDA SPRT_X
-            STA (SPRT_INF_LO),Y     ; On stocke la nouvelle valeur de Coord X
-            INY
+            STA (SPRT_INF_LO)       ; On stocke la nouvelle valeur de Coord X
+            LDY SPRT_COORD_Y
             LDA SPRT_Y
             STA (SPRT_INF_LO),Y     ; On stocke la nouvelle valeur de Coord X
             .EM
@@ -39,9 +37,8 @@ NEW
 ; 
 ; Output:
 ; void
-DEL_ZONE
-            LDY #$00            ; Lecture de nb de byte par ligne
-            LDA (SHAPE_LO),Y
+DEL_ZONE   
+            LDA (SHAPE_LO)      ; Lecture de nb de byte par ligne
 			STA .02+1
 
             LDY #$02            ; Lecture de nb total de bytes
@@ -203,8 +200,12 @@ END_DRAW_SHAPE
 DRAW_SPRITE
             >GET_SHAPE
 
-            LDY #$00
+            LDY SPRT_ACTIVE     ; Doit-on afficher le sprite ?
             LDA (SPRT_INF_LO),Y
+            BNE .2              ; Sinon on sort
+            RTS
+
+.2          LDA (SPRT_INF_LO)
             AND #$01
             BEQ .1
 
@@ -228,17 +229,16 @@ DRAW_SPRITE
 ; Output:
 ; void
 MV_SPRITE   LDA #$00                ; On va tester si le sprite doit bouger
-            LDY #$02                ; En regardant si Speed X ou Speed Y
+            LDY SPRT_SPEED_X        ; En regardant si Speed X ou Speed Y
             ORA (SPRT_INF_LO),Y     ; sont different de 0
-            LDY #$03
+            LDY SPRT_SPEED_Y
             ORA (SPRT_INF_LO),Y
             BEQ END_MV_SPRITE       ; Si les deux sont à 0, on sort
 
             ; Mouvement sur l'axe des X
-            LDY #$00                ; Récupération de Coord X
-            LDA (SPRT_INF_LO),Y
+            LDA (SPRT_INF_LO)       ; Récupération de Coord X
             TAX                     ; On place le res dans X
-            LDY #$02                ; Lecture de speed X
+            LDY SPRT_SPEED_X        ; Lecture de speed X
             LDA #$8F
             AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
             BEQ .04                 ; Si c'est zero : pas de mouvements
@@ -247,14 +247,13 @@ MV_SPRITE   LDA #$00                ; On va tester si le sprite doit bouger
             JMP .03
 .02         INX
 .03         TXA
-            LDY #$00
-            STA (SPRT_INF_LO),Y     ; On stocke la nouvelle valeur de CoordX
+            STA (SPRT_INF_LO)       ; On stocke la nouvelle valeur de CoordX
 
             ; Mouvement sur l'axe des Y
-.04         LDY #$01                ; Récupération de Coord Y
+.04         LDY SPRT_COORD_Y        ; Récupération de Coord Y
             LDA (SPRT_INF_LO),Y
             TAX                     ; On place le res dans X
-            LDY #$03                ; Lecture de speed Y
+            LDY SPRT_SPEED_Y        ; Lecture de speed Y
             LDA #$8F
             AND (SPRT_INF_LO),Y     ; On teste si speed Y est negatif
             BEQ END_MV_SPRITE       ; Si c'est zero : pas de mouvements
@@ -263,7 +262,7 @@ MV_SPRITE   LDA #$00                ; On va tester si le sprite doit bouger
             JMP .07
 .06         INX
 .07         TXA
-            LDY #$01
+            LDY SPRT_COORD_Y
             STA (SPRT_INF_LO),Y     ; On stocke la nouvelle valeur de CoordY
 
 END_MV_SPRITE

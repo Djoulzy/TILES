@@ -22,10 +22,17 @@ READKEYB    LDA #$00
 ; +3: Speed Y
 ; +4: Timer Default
 ; +5: Timer compter
+; +6: Sprite Active/hidden
 ; +6: Sprite def LO
 ; +7: Sprite def HI
-PLYR_NFO    .HS 00,0C,00,00,00,00
+PLYR_NFO    .HS 00,0C,00,00,00,00,01
             .DA #PLAYER,/PLAYER
+
+SHOOT_NFO   .HS 00,00,00,00,00,00,00
+            .DA #SHOOT,/SHOOT
+
+NB_SHOOT    .HS 01
+SHOOT_LIST  .DA #SHOOT_NFO,/SHOOT_NFO
 *--------------------------------------
 PLYR_RIGHT  LDY #$01        ; Y: Nb bytes per line
             LDA #$10        ; A: Nb lines 
@@ -76,14 +83,15 @@ MV_PLAYER   LDA #PLYR_NFO
             TAX
             BEQ END_MV_PLAYER
 
-            ;PHX
             >GET_COORD 
-            ;>GET_SHAPE
-            ;JSR DEL_ZONE
 
-            ;PLX
             TXA
-            CMP #$15
+            CMP #$20
+            BNE .01
+            LDA SHOOT_NFO+6
+            BNE .01
+            JMP PLYR_SHOOT
+.01         CMP #$15
             BEQ PLYR_RIGHT
             CMP #$08
             BEQ PLYR_LEFT
@@ -94,7 +102,47 @@ MV_PLAYER   LDA #PLYR_NFO
 
 END_MV_PLAYER
             JSR DRAW_SPRITE
+
+            LDY NB_SHOOT
+
+.01         LDA SHOOT_LIST,Y
+            STA SPRT_INF_HI
+            DEY
+            LDA SHOOT_LIST,Y
+            STA SPRT_INF_LO
+            DEY
+            PHY
+            JSR MV_SPRITE
+            LDA (SPRT_INF_LO)
+            CMP #$24
+            BNE .02
+
+            >GET_COORD
+            LDY #$04        ; Y: Nb bytes per line
+            LDA #$03        ; A: Nb lines 
+            LDX #$012       ; X: Total bytes
+            JSR FILL_AREA
+            LDA #$00
+            STA SHOOT_NFO
+            STA SHOOT_NFO+1
+            STA SHOOT_NFO+2
+            STA SHOOT_NFO+6
+
+.02         JSR DRAW_SPRITE
+            PLY
+            BPL .01
+
             RTS
+*--------------------------------------
+PLYR_SHOOT
+            LDA PLYR_NFO
+            STA SHOOT_NFO
+            LDA PLYR_NFO+1
+            STA SHOOT_NFO+1
+            LDA #$01
+            STA SHOOT_NFO+2
+            STA SHOOT_NFO+6
+            JMP END_MV_PLAYER
 *--------------------------------------
 MAN
 SAVE /DEV/TILES/SRC/PLAYER.S

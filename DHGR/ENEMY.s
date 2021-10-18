@@ -6,27 +6,27 @@ NEW
 *			.OR	$800
 *			.TF /DEV/TILES/OBJ/ENEMY
 *--------------------------------------
-OBJ1_NFO    .HS 24,06,00,01,00,00
+OBJ1_NFO    .HS 24,06,00,01,00,00,01
             .DA #MONSTER,/MONSTER
-OBJ2_NFO    .HS 20,06,00,81,00,00
+OBJ2_NFO    .HS 20,06,00,82,00,00,01
             .DA #MONSTER,/MONSTER
-OBJ3_NFO    .HS 1C,06,00,01,00,00
+OBJ3_NFO    .HS 1C,06,00,01,00,00,01
             .DA #MONSTER,/MONSTER
-OBJ4_NFO    .HS 18,06,00,81,00,00
+OBJ4_NFO    .HS 18,06,00,81,00,00,01
             .DA #MONSTER,/MONSTER
 
 NB_ENEMY    .HS 07
 ENEMY_LIST  .DA #OBJ1_NFO,/OBJ1_NFO,#OBJ2_NFO,/OBJ2_NFO,#OBJ3_NFO,/OBJ3_NFO,#OBJ4_NFO,/OBJ4_NFO
 *--------------------------------------
 MV_MONSTER
-            LDY #$03                ; Lecture de speed Y
+            LDY SPRT_SPEED_Y        ; Lecture de speed Y
             LDA #$8F
             AND (SPRT_INF_LO),Y     ; On teste si speed X est negatif
             BEQ .04                 ; Si c'est zero : pas de mouvements
             BPL .06                 ; sinon on branche
 
             ; Decrementation de Y
-            LDY #$01
+            LDY SPRT_COORD_Y
             LDA (SPRT_INF_LO),Y     ; On charge Coord Y
             DEC
             TAX
@@ -35,17 +35,18 @@ MV_MONSTER
             JMP .2
 
             ; Incrementation de Y
-.06         LDY #$01
+.06         LDY SPRT_COORD_Y
             LDA (SPRT_INF_LO),Y     ; On charge Coord Y        
+            INC
             INC
             TAX
             CMP #$B0                ; On teste si on atteint le bas de l'ecran
             BNE .3                  ; non, on sort 
             LDA #$81                ; Valeur negative pour Speed Y
 
-.2          LDY #$03          
+.2          LDY SPRT_SPEED_Y          
             STA (SPRT_INF_LO),Y     ; Sauvegarde de la nouvelle vitesse
-.3          LDY #$01
+.3          LDY SPRT_COORD_Y
             TXA
             STA (SPRT_INF_LO),Y     ; Sauvegarde de Coord Y
 .4          JSR DRAW_SPRITE

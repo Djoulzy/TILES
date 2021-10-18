@@ -79,14 +79,6 @@ ABOFFSET	.HS 00,00,FF,01,01,01,FF,02,02,FF,03,03,03,FF
 			.HS 24,24,FF,25,25,25,FF,26,26,FF,27,27,27,FF
 *--------------------------------------
 PLAYER
-; [["blck","blck","brwn","brwn","brwn","blck","blck"],["blck","blck","brwn","pink","brwn","blck","blck"],
-; ["blck","blck","brwn","pink","brwn","blck","blck"],["blck","blck","blck","vilt","blck","blck","whte"],
-; ["blck","blck","ylow","ylow","ylow","gry2","whte"],["blck","ylow","ylow","ylow","gry2","gry1","blck"],
-; ["blck","ylow","ylow","gry2","gry1","ylow","blck"],["ylow","ylow","gry2","pink","ylow","ylow","blck"],
-; ["gry2","gry2","gry1","ylow","ylow","blck","blck"],["pink","gry2","gry1","gry1","gry1","blck","blck"],
-; ["blck","gry2","mdbl","mdbl","mdbl","blck","blck"],["blck","blck","mdbl","mdbl","mdbl","blck","blck"],
-; ["blck","blck","mdbl","blck","mdbl","blck","blck"],["blck","blck","mdbl","blck","mdbl","blck","blck"],
-; ["blck","blck","mdbl","blck","mdbl","blck","blck"],["blck","blck","mdbl","blck","mdbl","blck","blck"]]
 			.HS 02,10,20
 			.DA #PLAYER2,/PLAYER2
 			.HS 00,11
@@ -229,25 +221,6 @@ MONSTER2
 			.HS 48,01,48,00
 			.HS 00,00,00,00
 *--------------------------------------
-LETTER_A
-			.HS 01,08,08
-			.DA #%00000000
-			.DA #%00000000
-			.DA #%01110000
-			.DA #%00000000
-			.DA #%01110000
-			.DA #%00001100
-			.DA #%01110000
-			.DA #%00000000
-			.DA #%00000000
-			.DA #%00000000
-			.DA #%00000111
-			.DA #%00011000
-			.DA #%00011111
-			.DA #%00011000
-			.DA #%00011111
-			.DA #%00000000
-*--------------------------------------
 STAR
 			.HS 02,01,02
 			.DA #STAR2,/STAR2
@@ -287,6 +260,18 @@ PLANET
 	.HS 15,50,22,08,13,50,00,05,33,48,00,00,41,50,54,05
 	.HS 00,00,15,55,00,00,00,00,40,05,00,00,00,00,00,50
 *--------------------------------------
+SHOOT
+	.HS 04,03,0C
+	.DA #SHOOT_ALT,/SHOOT_ALT
+	.HS 00,00,00,33,00,00,7F,7F,00,00,00,33
+	.HS 00,00,18,00,00,00,7F,7F,00,00,00,06
+SHOOT_ALT
+	.HS 04,03,0C
+	.DA #SHOOT,/SHOOT
+	.HS 00,00,00,0C,00,00,7F,7F,00,00,00,4C
+	.HS 00,00,66,00,00,00,7F,7F,00,00,60,01
+*--------------------------------------
+
 MAN
 SAVE /DEV/TILES/SRC/GFXTABLES.S
 TEXT /DEV/TILES/TXT/GFXTABLES.S
