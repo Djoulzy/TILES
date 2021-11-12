@@ -38,7 +38,6 @@ MV_MONSTER
 .06         LDY SPRT_COORD_Y
             LDA (SPRT_INF_LO),Y     ; On charge Coord Y        
             INC
-            INC
             TAX
             CMP #$B0                ; On teste si on atteint le bas de l'ecran
             BNE .3                  ; non, on sort 

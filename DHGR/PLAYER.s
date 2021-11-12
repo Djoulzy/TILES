@@ -1,6 +1,6 @@
 NEW
     
-AUTO 4,1
+AUTO 4,1
             .OP	65C02
             .LIST OFF
 *			.OR	$800
@@ -26,7 +26,7 @@ READKEYB    LDA #$00
 ; +6: Sprite def LO
 ; +7: Sprite def HI
 PLYR_NFO    .HS 00,0C,00,00,00,00,01
-            .DA #PLAYER,/PLAYER
+            .DA #SHIP,/SHIP
 
 SHOOT_NFO   .HS 00,00,00,00,00,00,00
             .DA #SHOOT,/SHOOT
@@ -61,11 +61,11 @@ PLYR_DOWN   LDY #$02        ; Y: Nb bytes per line
 
 PLYR_UP     LDA PLYR_NFO+1
             CLC
-            ADC #$0C
+            ADC #$14
             STA SPRT_Y
-            LDY #$02        ; Y: Nb bytes per line
+            LDY #$04        ; Y: Nb bytes per line
             LDA #$04        ; A: Nb lines 
-            LDX #$08        ; X: Total bytes
+            LDX #$10        ; X: Total bytes
             JSR FILL_AREA
             LDA PLYR_NFO+1
             CLC
