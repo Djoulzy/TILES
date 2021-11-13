@@ -35,16 +35,18 @@ NB_SHOOT    .HS 01
 SHOOT_LIST  .DA #SHOOT_NFO,/SHOOT_NFO
 *--------------------------------------
 PLYR_RIGHT  LDY #$01        ; Y: Nb bytes per line
-            LDA #$10        ; A: Nb lines 
-            LDX #$10        ; X: Total bytes
+            LDA #$18        ; A: Nb lines 
+            LDX #$18        ; X: Total bytes
             JSR FILL_AREA
             INC PLYR_NFO
             JMP END_MV_PLAYER
 
 PLYR_LEFT   INC SPRT_X
+            INC SPRT_X
+            INC SPRT_X
             LDY #$01        ; Y: Nb bytes per line
-            LDA #$10        ; A: Nb lines 
-            LDX #$10        ; X: Total bytes
+            LDA #$18        ; A: Nb lines 
+            LDX #$18        ; X: Total bytes
             JSR FILL_AREA
             DEC PLYR_NFO
             JMP END_MV_PLAYER
@@ -92,8 +94,9 @@ MV_PLAYER   LDA #PLYR_NFO
             BNE .01
             JMP PLYR_SHOOT
 .01         CMP #$15
-            BEQ PLYR_RIGHT
-            CMP #$08
+            BNE .02
+            JMP PLYR_RIGHT
+.02         CMP #$08
             BEQ PLYR_LEFT
             CMP #$0A
             BEQ PLYR_DOWN
@@ -120,7 +123,7 @@ END_MV_PLAYER
             >GET_COORD
             LDY #$04        ; Y: Nb bytes per line
             LDA #$03        ; A: Nb lines 
-            LDX #$012       ; X: Total bytes
+            LDX #$12        ; X: Total bytes
             JSR FILL_AREA
             LDA #$00
             STA SHOOT_NFO
@@ -136,8 +139,12 @@ END_MV_PLAYER
 *--------------------------------------
 PLYR_SHOOT
             LDA PLYR_NFO
+            CLC
+            ADC #$03
             STA SHOOT_NFO
             LDA PLYR_NFO+1
+            CLC
+            ADC #$0B
             STA SHOOT_NFO+1
             LDA #$01
             STA SHOOT_NFO+2

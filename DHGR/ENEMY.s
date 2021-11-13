@@ -7,16 +7,26 @@ NEW
 *			.TF /DEV/TILES/OBJ/ENEMY
 *--------------------------------------
 OBJ1_NFO    .HS 24,06,00,01,00,00,01
-            .DA #MONSTER,/MONSTER
-OBJ2_NFO    .HS 20,06,00,82,00,00,01
-            .DA #MONSTER,/MONSTER
-OBJ3_NFO    .HS 1C,06,00,01,00,00,01
-            .DA #MONSTER,/MONSTER
-OBJ4_NFO    .HS 18,06,00,81,00,00,01
-            .DA #MONSTER,/MONSTER
+            .DA #MONSTER1,/MONSTER1
+OBJ2_NFO    .HS 20,30,00,82,00,00,01
+            .DA #MONSTER1,/MONSTER1
+OBJ3_NFO    .HS 1C,90,00,01,00,00,01
+            .DA #MONSTER1,/MONSTER1
+OBJ4_NFO    .HS 18,60,00,81,00,00,01
+            .DA #MONSTER1,/MONSTER1
 
-NB_ENEMY    .HS 07
+OBJ5_NFO    .HS 24,A4,00,01,00,00,01
+            .DA #MONSTER2,/MONSTER2
+OBJ6_NFO    .HS 20,74,00,82,00,00,01
+            .DA #MONSTER2,/MONSTER2
+OBJ7_NFO    .HS 1C,1A,00,01,00,00,01
+            .DA #MONSTER2,/MONSTER2
+OBJ8_NFO    .HS 18,44,00,81,00,00,01
+            .DA #MONSTER2,/MONSTER2
+
+NB_ENEMY    .HS 0F
 ENEMY_LIST  .DA #OBJ1_NFO,/OBJ1_NFO,#OBJ2_NFO,/OBJ2_NFO,#OBJ3_NFO,/OBJ3_NFO,#OBJ4_NFO,/OBJ4_NFO
+            .DA #OBJ5_NFO,/OBJ5_NFO,#OBJ6_NFO,/OBJ6_NFO,#OBJ7_NFO,/OBJ7_NFO,#OBJ8_NFO,/OBJ8_NFO
 *--------------------------------------
 MV_MONSTER
             LDY SPRT_SPEED_Y        ; Lecture de speed Y
@@ -29,6 +39,7 @@ MV_MONSTER
             LDY SPRT_COORD_Y
             LDA (SPRT_INF_LO),Y     ; On charge Coord Y
             DEC
+            DEC
             TAX
             BNE .3                  ; On teste si on atteint le haut de l'écran
             LDA #$01                ; Oui, on passe Speed Y en positif
@@ -37,6 +48,7 @@ MV_MONSTER
             ; Incrementation de Y
 .06         LDY SPRT_COORD_Y
             LDA (SPRT_INF_LO),Y     ; On charge Coord Y        
+            INC
             INC
             TAX
             CMP #$B0                ; On teste si on atteint le bas de l'ecran
