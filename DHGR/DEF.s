@@ -1,6 +1,6 @@
 NEW
     
-AUTO 4,1
+AUTO 4,1
                 .OP	65C02
                 .LIST OFF
 *			    .OR	$800
@@ -41,6 +41,8 @@ SPRT_TIME_CNT   .DA #$05
 SPRT_ACTIVE     .DA #$06
 SPRT_SHAPE_LO   .DA #$07
 SPRT_SHAPE_HI   .DA #$08
+SPRT_COLLIS_X   .DA #$09
+SPRT_COLLIS_Y   .DA #$0A
 *--------------------------------------
 MAN
 SAVE /DEV/TILES/SRC/DEF.S

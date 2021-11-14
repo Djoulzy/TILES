@@ -34,7 +34,7 @@ SHOOT_NFO   .HS 00,00,00,00,00,00,00
             .DA #SHOOT,/SHOOT
             .DA 00,00
 
-NB_SHOOT    .HS 00
+NB_SHOOT    .HS 01
 SHOOT_LIST  .DA #SHOOT_NFO,/SHOOT_NFO
 *--------------------------------------
 PLYR_RIGHT  LDY #$01        ; Y: Nb bytes per line
@@ -110,8 +110,6 @@ END_MV_PLAYER
             JSR DRAW_SPRITE
 
             LDY NB_SHOOT
-            BEQ END_MV_SHOOT
-
 MV_SHOOT    LDA SHOOT_LIST,Y
             STA SPRT_INF_HI
             DEY
@@ -124,7 +122,7 @@ MV_SHOOT    LDA SHOOT_LIST,Y
             CMP #$24
             BNE .01
 
-            >GET_COORD
+            >GET_COORD      ; Le shoot sort de l'ecran
             LDY #$04        ; Y: Nb bytes per line
             LDA #$03        ; A: Nb lines 
             LDX #$12        ; X: Total bytes
@@ -134,9 +132,17 @@ MV_SHOOT    LDA SHOOT_LIST,Y
             STA SHOOT_NFO+1
             STA SHOOT_NFO+2
             STA SHOOT_NFO+6
-            STA NB_SHOOT
+            PLY
+            JMP END_MV_SHOOT
 
 .01         JSR DRAW_SPRITE
+            LDA SHOOT_NFO
+            CLC
+            ADC #$04
+            STA SHOOT_NFO+9
+            LDA SHOOT_NFO+1
+            INC
+            STA SHOOT_NFO+10
             PLY
             BPL MV_SHOOT
 END_MV_SHOOT
@@ -158,7 +164,6 @@ PLYR_SHOOT
             LDA #$01
             STA SHOOT_NFO+2
             STA SHOOT_NFO+6
-            STA NB_SHOOT
             JMP END_MV_PLAYER
 *--------------------------------------
 MAN

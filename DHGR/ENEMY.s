@@ -1,6 +1,6 @@
 NEW
     
-AUTO 4,1
+AUTO 4,1
             .OP	65C02
             .LIST OFF
 *			.OR	$800
@@ -74,17 +74,18 @@ ENEMY
             DEY
             PHY
             
+            LDY SPRT_ACTIVE
+            LDA (SPRT_INF_LO),Y
+            BEQ .02
             JSR COLLISION
             JSR MV_MONSTER
 
-            PLY
+.02         PLY
             BPL .01
             RTS
 *--------------------------------------
 COLLISION
             LDY NB_SHOOT
-            BNE .01
-            RTS                     ; Pas de shoots
 .01         LDA SHOOT_LIST,Y
             STA SPRT2_INF_HI
             DEY
@@ -93,9 +94,13 @@ COLLISION
             DEY
             PHY
 
-            LDY #$00
+            LDY SPRT_ACTIVE
+            LDA (SPRT2_INF_LO),Y    ; Le shoot est il actif ?
+            BEQ END_COLLISION
+
+            LDY SPRT_COORD_X
             LDA (SPRT_INF_LO),Y     ; Coord X du sprite
-            LDY #$09
+            LDY SPRT_COLLIS_X
             CMP (SPRT2_INF_LO),Y    ; comp avec Coord X du shoot
             BCS END_COLLISION       ; X_Sprite > X_Shoot
             CLC
@@ -103,8 +108,20 @@ COLLISION
             CMP (SPRT2_INF_LO),Y    ; comp avec Coord X du shoot
             BCC END_COLLISION       ; X_Shoot > X_Sprite+4
 
-            PLY
-            BRK
+            LDY SPRT_COORD_Y
+            LDA (SPRT_INF_LO),Y     ; Coord Y du sprite
+            LDY SPRT_COLLIS_Y
+            CMP (SPRT2_INF_LO),Y    ; comp avec Coord X du shoot
+            BCS END_COLLISION       ; Y_Sprite > Y_Shoot
+            CLC
+            ADC #$0F                ; Y_Sprite + 15 lignes (fin du sprite)
+            CMP (SPRT2_INF_LO),Y    ; comp avec Coord Y du shoot
+            BCC END_COLLISION       ; Y_Shoot > Y_Sprite+15
+
+            LDA #$00
+            LDY SPRT_ACTIVE
+            STA (SPRT2_INF_LO),Y
+            STA (SPRT_INF_LO),Y
 
             PLY
             BPL .01
