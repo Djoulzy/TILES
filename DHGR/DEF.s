@@ -25,7 +25,8 @@ SHAPE_LO        .EQ $FA
 SHAPE_HI        .EQ $FB
 SPRT_INF_LO     .EQ $FC
 SPRT_INF_HI     .EQ $FD
-CPT             .EQ $FE
+SPRT2_INF_LO    .EQ $FE
+SPRT2_INF_HI    .EQ $FF
 VBL			    .EQ	$C019
 *--------------------------------------
 SPRT_X          .HS 00

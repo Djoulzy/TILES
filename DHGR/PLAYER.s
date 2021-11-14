@@ -23,15 +23,18 @@ READKEYB    LDA #$00
 ; +4: Timer Default
 ; +5: Timer compter
 ; +6: Sprite Active/hidden
-; +6: Sprite def LO
-; +7: Sprite def HI
+; +7: Sprite def LO
+; +8: Sprite def HI
+; +9: Collision X
+;+10: Collision Y
 PLYR_NFO    .HS 00,0C,00,00,00,00,01
             .DA #SHIP,/SHIP
 
 SHOOT_NFO   .HS 00,00,00,00,00,00,00
             .DA #SHOOT,/SHOOT
+            .DA 00,00
 
-NB_SHOOT    .HS 01
+NB_SHOOT    .HS 00
 SHOOT_LIST  .DA #SHOOT_NFO,/SHOOT_NFO
 *--------------------------------------
 PLYR_RIGHT  LDY #$01        ; Y: Nb bytes per line
@@ -107,8 +110,9 @@ END_MV_PLAYER
             JSR DRAW_SPRITE
 
             LDY NB_SHOOT
+            BEQ END_MV_SHOOT
 
-.01         LDA SHOOT_LIST,Y
+MV_SHOOT    LDA SHOOT_LIST,Y
             STA SPRT_INF_HI
             DEY
             LDA SHOOT_LIST,Y
@@ -118,7 +122,7 @@ END_MV_PLAYER
             JSR MV_SPRITE
             LDA (SPRT_INF_LO)
             CMP #$24
-            BNE .02
+            BNE .01
 
             >GET_COORD
             LDY #$04        ; Y: Nb bytes per line
@@ -130,25 +134,31 @@ END_MV_PLAYER
             STA SHOOT_NFO+1
             STA SHOOT_NFO+2
             STA SHOOT_NFO+6
+            STA NB_SHOOT
 
-.02         JSR DRAW_SPRITE
+.01         JSR DRAW_SPRITE
             PLY
-            BPL .01
-
+            BPL MV_SHOOT
+END_MV_SHOOT
             RTS
 *--------------------------------------
 PLYR_SHOOT
             LDA PLYR_NFO
             CLC
-            ADC #$03
+            ADC #$02
             STA SHOOT_NFO
+            ADC #$04
+            STA SHOOT_NFO+9
             LDA PLYR_NFO+1
             CLC
             ADC #$0B
             STA SHOOT_NFO+1
+            INC
+            STA SHOOT_NFO+10
             LDA #$01
             STA SHOOT_NFO+2
             STA SHOOT_NFO+6
+            STA NB_SHOOT
             JMP END_MV_PLAYER
 *--------------------------------------
 MAN

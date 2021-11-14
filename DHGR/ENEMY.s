@@ -73,9 +73,44 @@ ENEMY
             STA SPRT_INF_LO
             DEY
             PHY
+            
+            JSR COLLISION
             JSR MV_MONSTER
+
             PLY
             BPL .01
+            RTS
+*--------------------------------------
+COLLISION
+            LDY NB_SHOOT
+            BNE .01
+            RTS                     ; Pas de shoots
+.01         LDA SHOOT_LIST,Y
+            STA SPRT2_INF_HI
+            DEY
+            LDA SHOOT_LIST,Y
+            STA SPRT2_INF_LO
+            DEY
+            PHY
+
+            LDY #$00
+            LDA (SPRT_INF_LO),Y     ; Coord X du sprite
+            LDY #$09
+            CMP (SPRT2_INF_LO),Y    ; comp avec Coord X du shoot
+            BCS END_COLLISION       ; X_Sprite > X_Shoot
+            CLC
+            ADC #$04                ; X_Sprite + 4 octects (fin du sprite)
+            CMP (SPRT2_INF_LO),Y    ; comp avec Coord X du shoot
+            BCC END_COLLISION       ; X_Shoot > X_Sprite+4
+
+            PLY
+            BRK
+
+            PLY
+            BPL .01
+            RTS
+END_COLLISION            
+            PLY
             RTS
 *--------------------------------------
 MAN
